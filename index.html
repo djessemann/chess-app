@@ -48,8 +48,9 @@
         #board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
+            grid-template-rows: repeat(8, 1fr);
             width: min(90vw, 90vh - 120px, 480px);
-            height: min(90vw, 90vh - 120px, 480px);
+            aspect-ratio: 1;
             border-radius: 4px;
             overflow: hidden;
             box-shadow:
@@ -66,6 +67,8 @@
             justify-content: center;
             cursor: pointer;
             user-select: none;
+            aspect-ratio: 1;
+            overflow: hidden;
         }
 
         .sq.l { background: var(--light); }
@@ -93,7 +96,7 @@
         }
 
         .pc {
-            font-size: min(10vw, 52px);
+            font-size: min(8vw, 44px);
             line-height: 1;
             pointer-events: none;
             filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
