@@ -10,20 +10,18 @@
         :root {
             --light: #f0d9b5;
             --dark: #b58863;
-            --bg: #312e2b;
-            --card: #272522;
-            --accent: #81b64c;
-            --text: #fff;
-            --muted: #999;
+            --bg: #1a1a1a;
+            --card: #262626;
+            --accent: #7fa650;
+            --text: #e8e8e8;
+            --muted: #777;
+            --board-size: min(90vw, calc(100dvh - 190px), 480px);
         }
 
-        html {
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
+        html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
             background: var(--bg);
             color: var(--text);
             height: 100dvh;
@@ -32,31 +30,61 @@
             align-items: center;
             justify-content: center;
             overflow: hidden;
-            gap: 12px;
-            padding: 12px;
+            gap: 6px;
+            padding: 8px;
         }
 
-        #status {
-            font-size: 16px;
-            font-weight: 500;
-            text-align: center;
-            min-height: 24px;
-            text-wrap: balance;
+        /* Player bars */
+        .player-bar {
+            width: var(--board-size);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 2px;
+            font-size: 13px;
+            min-height: 28px;
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .turn-dot {
+            width: 7px; height: 7px;
+            border-radius: 50%;
+            background: #444;
+            transition-property: background;
+            transition-duration: 200ms;
+        }
+        .turn-dot.active { background: var(--accent); }
+
+        .captured-pieces {
+            font-size: 11px;
+            opacity: 0.7;
+            letter-spacing: -1px;
+        }
+
+        .mat-diff {
+            font-size: 11px;
+            color: var(--muted);
+            font-weight: 600;
             font-variant-numeric: tabular-nums;
+            margin-left: 3px;
         }
 
+        /* Board */
         #board {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
             grid-template-rows: repeat(8, 1fr);
-            width: min(90vw, 90vh - 120px, 480px);
+            width: var(--board-size);
             aspect-ratio: 1;
-            border-radius: 4px;
+            border-radius: 3px;
             overflow: hidden;
-            box-shadow:
-                0 0 0 1px rgba(0,0,0,0.08),
-                0 4px 8px rgba(0,0,0,0.15),
-                0 8px 32px rgba(0,0,0,0.25);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.5);
             touch-action: manipulation;
         }
 
@@ -68,39 +96,44 @@
             cursor: pointer;
             user-select: none;
             aspect-ratio: 1;
-            overflow: hidden;
         }
 
         .sq.l { background: var(--light); }
         .sq.d { background: var(--dark); }
-        .sq.sel { background: rgba(255,255,0,0.5) !important; }
-        .sq.last { background: rgba(155,199,0,0.4) !important; }
-        .sq.chk { background: rgba(255,0,0,0.5) !important; }
+        .sq.sel { background: rgba(255,255,0,0.45) !important; }
+        .sq.last { background: rgba(155,199,0,0.41) !important; }
+        .sq.chk { background: radial-gradient(ellipse at center, rgba(255,0,0,0.6) 0%, rgba(200,0,0,0.25) 60%, transparent 80%) !important; }
 
         .sq.dot::after {
             content: '';
             position: absolute;
-            width: 28%;
-            height: 28%;
-            background: rgba(0,0,0,0.15);
+            width: 26%; height: 26%;
+            background: rgba(0,0,0,0.14);
             border-radius: 50%;
+            z-index: 2;
         }
 
         .sq.ring::after {
             content: '';
             position: absolute;
-            width: 90%;
-            height: 90%;
-            border: 4px solid rgba(0,0,0,0.15);
+            width: 85%; height: 85%;
+            border: 5px solid rgba(0,0,0,0.14);
             border-radius: 50%;
+            z-index: 2;
         }
 
         .pc {
-            font-size: min(8vw, 44px);
+            font-size: calc(var(--board-size) / 10.5);
             line-height: 1;
             pointer-events: none;
-            filter: drop-shadow(1px 1px 1px rgba(0,0,0,0.3));
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
             z-index: 1;
+        }
+
+        .pc.anim {
+            transition-property: transform;
+            transition-duration: 120ms;
+            transition-timing-function: ease-out;
         }
 
         .coord {
@@ -108,48 +141,59 @@
             font-size: 9px;
             font-weight: 700;
             pointer-events: none;
-            opacity: 0.6;
+            opacity: 0.5;
             font-variant-numeric: tabular-nums;
         }
         .coord.file { bottom: 1px; right: 3px; }
         .coord.rank { top: 1px; left: 3px; }
         .sq.l .coord { color: var(--dark); }
         .sq.d .coord { color: var(--light); }
+        .no-coords .coord { display: none; }
 
-        #controls {
-            display: flex;
-            gap: 10px;
+        /* Status */
+        #status {
+            font-size: 12px;
+            color: var(--muted);
+            min-height: 18px;
+            font-variant-numeric: tabular-nums;
         }
 
-        button {
-            padding: 12px 24px;
-            font-size: 15px;
+        /* Controls */
+        #controls {
+            display: flex;
+            gap: 6px;
+            width: var(--board-size);
+        }
+
+        #controls button {
+            flex: 1;
+            padding: 10px 0;
+            font-size: 13px;
             font-weight: 600;
             border: none;
-            border-radius: 8px;
+            border-radius: 6px;
             cursor: pointer;
             background: var(--card);
             color: var(--text);
-            min-height: 44px;
-            transition-property: scale;
-            transition-duration: 150ms;
+            min-height: 40px;
+            transition-property: scale, opacity;
+            transition-duration: 120ms;
             transition-timing-function: ease-out;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.06),
-                0 1px 2px rgba(0,0,0,0.2);
         }
-        button:active { scale: 0.96; }
-        button.pri { background: var(--accent); }
+        #controls button:active { scale: 0.96; }
+        #controls button:disabled { opacity: 0.3; cursor: default; }
+        #controls button:disabled:active { scale: 1; }
+        #controls button.pri { background: var(--accent); color: #fff; }
 
+        /* Overlays */
         .overlay {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.8);
+            background: rgba(0,0,0,0.7);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            opacity: 0;
-            visibility: hidden;
+            opacity: 0; visibility: hidden;
             transition-property: opacity, visibility;
             transition-duration: 0.2s;
         }
@@ -157,43 +201,130 @@
 
         .modal {
             background: var(--card);
-            padding: 28px;
-            border-radius: 16px;
+            padding: 28px 32px;
+            border-radius: 14px;
             text-align: center;
-            box-shadow:
-                0 0 0 1px rgba(255,255,255,0.06),
-                0 4px 12px rgba(0,0,0,0.2),
-                0 16px 48px rgba(0,0,0,0.3);
+            box-shadow: 0 16px 48px rgba(0,0,0,0.5);
+            transform: scale(0.95);
+            transition-property: transform;
+            transition-duration: 0.2s;
         }
-        .modal h2 { margin-bottom: 6px; text-wrap: balance; }
-        .modal p { color: var(--muted); margin-bottom: 20px; text-wrap: pretty; }
+        .overlay.show .modal { transform: scale(1); }
 
-        .promo-options {
-            display: flex;
-            gap: 8px;
-            justify-content: center;
-            margin-bottom: 12px;
+        .modal h2 { margin-bottom: 4px; font-size: 20px; text-wrap: balance; }
+        .modal p { color: var(--muted); margin-bottom: 20px; font-size: 14px; text-wrap: pretty; }
+
+        .modal button {
+            padding: 10px 32px;
+            font-size: 14px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            background: var(--accent);
+            color: #fff;
+            min-height: 40px;
+            transition-property: scale;
+            transition-duration: 120ms;
         }
+        .modal button:active { scale: 0.96; }
+
+        .promo-options { display: flex; gap: 6px; justify-content: center; margin-bottom: 16px; }
+
         .promo-btn {
-            width: 56px; height: 56px;
-            font-size: 36px;
+            width: 52px; height: 52px;
+            font-size: 32px;
             display: flex;
             align-items: center;
             justify-content: center;
             background: var(--light);
             border-radius: 8px;
             cursor: pointer;
-        }
-        .promo-btn {
             transition-property: scale;
-            transition-duration: 150ms;
-            transition-timing-function: ease-out;
+            transition-duration: 120ms;
         }
         .promo-btn:active { scale: 0.96; }
 
-        .dots { display: inline-flex; gap: 4px; vertical-align: middle; }
+        /* Settings drawer */
+        .settings-backdrop {
+            position: fixed; inset: 0;
+            background: rgba(0,0,0,0.4);
+            z-index: 19;
+            opacity: 0; visibility: hidden;
+            transition-property: opacity, visibility;
+            transition-duration: 0.2s;
+        }
+        .settings-backdrop.open { opacity: 1; visibility: visible; }
+
+        .settings-panel {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--card);
+            border-radius: 14px 14px 0 0;
+            padding: 20px 24px;
+            padding-bottom: max(20px, env(safe-area-inset-bottom));
+            z-index: 20;
+            transform: translateY(100%);
+            transition-property: transform;
+            transition-duration: 0.25s;
+            transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+        }
+        .settings-panel.open { transform: translateY(0); }
+
+        .setting-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+        .setting-row + .setting-row { border-top: 1px solid rgba(255,255,255,0.06); }
+        .setting-label { font-size: 14px; }
+
+        .seg-control {
+            display: flex;
+            background: rgba(255,255,255,0.06);
+            border-radius: 6px;
+            overflow: hidden;
+        }
+        .seg-btn {
+            padding: 6px 14px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            background: transparent;
+            color: var(--muted);
+            transition-property: background, color;
+            transition-duration: 120ms;
+        }
+        .seg-btn.active { background: var(--accent); color: #fff; }
+
+        .toggle {
+            width: 44px; height: 24px;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.1);
+            cursor: pointer;
+            position: relative;
+            transition-property: background;
+            transition-duration: 120ms;
+        }
+        .toggle.on { background: var(--accent); }
+        .toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px; left: 2px;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            transition-property: transform;
+            transition-duration: 120ms;
+        }
+        .toggle.on::after { transform: translateX(20px); }
+
+        /* Thinking dots */
+        .dots { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
         .dots span {
-            width: 6px; height: 6px;
+            width: 5px; height: 5px;
             background: var(--accent);
             border-radius: 50%;
             animation: bounce 1.2s infinite ease-in-out both;
@@ -208,25 +339,59 @@
     </style>
 </head>
 <body>
-    <div id="status">Your turn</div>
+    <div class="player-bar" id="topBar">
+        <div class="player-info"><span class="turn-dot" id="topDot"></span><span id="topName">Computer</span></div>
+        <div><span class="captured-pieces" id="topCaptured"></span><span class="mat-diff" id="topDiff"></span></div>
+    </div>
+
     <div id="board"></div>
+
+    <div class="player-bar" id="bottomBar">
+        <div class="player-info"><span class="turn-dot" id="bottomDot"></span><span id="bottomName">You</span></div>
+        <div><span class="captured-pieces" id="bottomCaptured"></span><span class="mat-diff" id="bottomDiff"></span></div>
+    </div>
+
+    <div id="status"></div>
+
     <div id="controls">
-        <button id="undoBtn">Undo</button>
-        <button id="newBtn" class="pri">New Game</button>
+        <button id="undoBtn" disabled>Undo</button>
+        <button id="flipBtn">Flip</button>
+        <button id="newBtn" class="pri">New</button>
+        <button id="settingsBtn">Settings</button>
     </div>
 
     <div class="overlay" id="gameOver">
         <div class="modal">
             <h2 id="goTitle"></h2>
             <p id="goMsg"></p>
-            <button class="pri" id="goBtn">Play Again</button>
+            <button id="goBtn">Play Again</button>
         </div>
     </div>
 
     <div class="overlay" id="promoOverlay">
         <div class="modal">
-            <h2>Promote Pawn</h2>
+            <h2>Promote</h2>
             <div class="promo-options" id="promoOpts"></div>
+        </div>
+    </div>
+
+    <div class="settings-backdrop" id="settingsBackdrop"></div>
+    <div class="settings-panel" id="settingsPanel">
+        <div class="setting-row">
+            <span class="setting-label">Difficulty</span>
+            <div class="seg-control" id="diffControl">
+                <button class="seg-btn" data-d="2">Easy</button>
+                <button class="seg-btn active" data-d="3">Medium</button>
+                <button class="seg-btn" data-d="4">Hard</button>
+            </div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Sound</span>
+            <div class="toggle on" id="soundToggle"></div>
+        </div>
+        <div class="setting-row">
+            <span class="setting-label">Coordinates</span>
+            <div class="toggle on" id="coordToggle"></div>
         </div>
     </div>
 
@@ -249,47 +414,92 @@
             k:[[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-30,-40,-40,-50,-50,-40,-40,-30],[-20,-30,-30,-40,-40,-30,-30,-20],[-10,-20,-20,-20,-20,-20,-20,-10],[20,20,0,0,0,0,20,20],[20,30,10,0,0,10,30,20]]
         };
 
-        const DEPTH = 3;
-
+        // State
         let game = new Chess();
         let selected = null;
         let moves = [];
         let lastMove = null;
         let thinking = false;
+        let flipped = false;
+        let searchDepth = 3;
+        let soundOn = true;
+        let showCoords = true;
+
+        // Load saved settings
+        try {
+            const s = JSON.parse(localStorage.getItem('chess-settings'));
+            if (s) {
+                searchDepth = s.depth || 3;
+                soundOn = s.sound !== false;
+                showCoords = s.coords !== false;
+            }
+        } catch(e) {}
+
+        function saveSettings() {
+            localStorage.setItem('chess-settings', JSON.stringify({
+                depth: searchDepth, sound: soundOn, coords: showCoords
+            }));
+        }
 
         const $ = id => document.getElementById(id);
-        const statusEl = $('status');
         const boardEl = $('board');
 
-        // Build board
+        // ── Sound ──────────────────────────────────────────────
+        let audioCtx;
+        function beep(freq, dur, type) {
+            if (!soundOn) return;
+            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const osc = audioCtx.createOscillator();
+            const g = audioCtx.createGain();
+            osc.type = type || 'sine';
+            osc.frequency.value = freq;
+            g.gain.value = 0.06;
+            g.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + dur);
+            osc.connect(g);
+            g.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + dur);
+        }
+
+        // ── Board ──────────────────────────────────────────────
+        function squareName(r, c) {
+            const dr = flipped ? 7 - r : r;
+            const dc = flipped ? 7 - c : c;
+            return String.fromCharCode(97 + dc) + (8 - dr);
+        }
+
         function buildBoard() {
             boardEl.innerHTML = '';
             for (let r = 0; r < 8; r++) {
                 for (let c = 0; c < 8; c++) {
+                    const dr = flipped ? 7 - r : r;
+                    const dc = flipped ? 7 - c : c;
+                    const name = String.fromCharCode(97 + dc) + (8 - dr);
                     const sq = document.createElement('div');
-                    const name = String.fromCharCode(97 + c) + (8 - r);
-                    sq.className = `sq ${(r + c) % 2 === 0 ? 'l' : 'd'}`;
+                    sq.className = `sq ${(dr + dc) % 2 === 0 ? 'l' : 'd'}`;
                     sq.dataset.s = name;
 
                     if (c === 0) {
-                        const coord = document.createElement('span');
-                        coord.className = 'coord rank';
-                        coord.textContent = 8 - r;
-                        sq.appendChild(coord);
+                        const co = document.createElement('span');
+                        co.className = 'coord rank';
+                        co.textContent = 8 - dr;
+                        sq.appendChild(co);
                     }
                     if (r === 7) {
-                        const coord = document.createElement('span');
-                        coord.className = 'coord file';
-                        coord.textContent = String.fromCharCode(97 + c);
-                        sq.appendChild(coord);
+                        const co = document.createElement('span');
+                        co.className = 'coord file';
+                        co.textContent = String.fromCharCode(97 + dc);
+                        sq.appendChild(co);
                     }
 
                     sq.addEventListener('click', () => tap(name));
                     boardEl.appendChild(sq);
                 }
             }
+            boardEl.classList.toggle('no-coords', !showCoords);
         }
 
+        // ── Render ─────────────────────────────────────────────
         function render() {
             const board = game.board();
             const check = game.in_check();
@@ -297,11 +507,12 @@
 
             for (let r = 0; r < 8; r++) {
                 for (let c = 0; c < 8; c++) {
-                    const name = String.fromCharCode(97 + c) + (8 - r);
+                    const dr = flipped ? 7 - r : r;
+                    const dc = flipped ? 7 - c : c;
+                    const name = String.fromCharCode(97 + dc) + (8 - dr);
                     const sq = boardEl.querySelector(`[data-s="${name}"]`);
-                    const piece = board[r][c];
+                    const piece = board[dr][dc];
 
-                    // Reset extra classes
                     sq.classList.remove('sel', 'last', 'chk', 'dot', 'ring');
 
                     if (selected === name) sq.classList.add('sel');
@@ -324,43 +535,120 @@
                     }
                 }
             }
-            updateStatus();
+            updateUI();
         }
 
-        function updateStatus() {
+        // ── Move animation ─────────────────────────────────────
+        function animateMove(from, to, callback) {
+            const fromSq = boardEl.querySelector(`[data-s="${from}"]`);
+            const toSq = boardEl.querySelector(`[data-s="${to}"]`);
+            if (!fromSq || !toSq) { callback(); return; }
+
+            const fromRect = fromSq.getBoundingClientRect();
+            const toRect = toSq.getBoundingClientRect();
+            const pcEl = fromSq.querySelector('.pc');
+            if (!pcEl) { callback(); return; }
+
+            const dx = toRect.left - fromRect.left;
+            const dy = toRect.top - fromRect.top;
+
+            pcEl.style.transform = `translate(${dx}px, ${dy}px)`;
+            pcEl.style.zIndex = '10';
+            pcEl.classList.add('anim');
+
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    pcEl.style.transform = '';
+                    pcEl.addEventListener('transitionend', function handler() {
+                        pcEl.removeEventListener('transitionend', handler);
+                        pcEl.classList.remove('anim');
+                        pcEl.style.zIndex = '';
+                        callback();
+                    });
+                });
+            });
+        }
+
+        // ── UI updates ─────────────────────────────────────────
+        function updateUI() {
+            const statusEl = $('status');
             if (game.game_over()) {
-                statusEl.textContent = 'Game over';
+                statusEl.textContent = '';
             } else if (thinking) {
-                statusEl.innerHTML = 'Thinking <span class="dots"><span></span><span></span><span></span></span>';
+                statusEl.innerHTML = 'Thinking<span class="dots"><span></span><span></span><span></span></span>';
             } else {
                 statusEl.textContent = game.turn() === 'w' ? 'Your turn' : '';
             }
+
+            // Turn dots
+            const wt = game.turn() === 'w' && !game.game_over();
+            const bt = game.turn() === 'b' && !game.game_over();
+            $('topDot').classList.toggle('active', flipped ? wt : bt);
+            $('bottomDot').classList.toggle('active', flipped ? bt : wt);
+            $('topName').textContent = flipped ? 'You' : 'Computer';
+            $('bottomName').textContent = flipped ? 'Computer' : 'You';
+
+            // Undo
+            $('undoBtn').disabled = thinking || game.history().length < 2;
+
+            // Captured pieces
+            updateCaptured();
         }
 
-        // Tap to select / move
+        function updateCaptured() {
+            const hist = game.history({ verbose: true });
+            const byCapturedByWhite = []; // black pieces you took
+            const byCapturedByBlack = []; // white pieces computer took
+
+            for (const m of hist) {
+                if (m.captured) {
+                    if (m.color === 'w') byCapturedByWhite.push(m.captured);
+                    else byCapturedByBlack.push(m.captured);
+                }
+            }
+
+            const order = { q:0, r:1, b:2, n:3, p:4 };
+            byCapturedByWhite.sort((a,b) => order[a] - order[b]);
+            byCapturedByBlack.sort((a,b) => order[a] - order[b]);
+
+            // Display: show the pieces each player captured
+            const yourCaptures = byCapturedByWhite.map(p => P[p]).join('');
+            const compCaptures = byCapturedByBlack.map(p => P[p.toUpperCase()]).join('');
+
+            const yourMat = byCapturedByWhite.reduce((s,p) => s + VAL[p], 0);
+            const compMat = byCapturedByBlack.reduce((s,p) => s + VAL[p], 0);
+            const diff = yourMat - compMat;
+            const diffVal = Math.round(Math.abs(diff) / 100);
+
+            if (flipped) {
+                $('topCaptured').textContent = yourCaptures;
+                $('bottomCaptured').textContent = compCaptures;
+                $('topDiff').textContent = diff > 0 && diffVal ? `+${diffVal}` : '';
+                $('bottomDiff').textContent = diff < 0 && diffVal ? `+${diffVal}` : '';
+            } else {
+                $('topCaptured').textContent = compCaptures;
+                $('bottomCaptured').textContent = yourCaptures;
+                $('topDiff').textContent = diff < 0 && diffVal ? `+${diffVal}` : '';
+                $('bottomDiff').textContent = diff > 0 && diffVal ? `+${diffVal}` : '';
+            }
+        }
+
+        // ── Interaction ────────────────────────────────────────
         function tap(name) {
             if (thinking || game.turn() !== 'w' || game.game_over()) return;
-
             const piece = game.get(name);
 
             if (selected) {
                 const mv = moves.find(m => m.to === name);
                 if (mv) {
-                    if (mv.flags.includes('p')) {
-                        showPromo(selected, name);
-                    } else {
-                        doMove(selected, name);
-                    }
+                    if (mv.flags.includes('p')) { showPromo(selected, name); }
+                    else { doMove(selected, name); }
                     return;
                 }
-                if (piece && piece.color === 'w') {
-                    select(name);
-                    return;
-                }
+                if (piece && piece.color === 'w') { select(name); return; }
                 deselect();
                 return;
             }
-
             if (piece && piece.color === 'w') select(name);
         }
 
@@ -377,15 +665,28 @@
         }
 
         function doMove(from, to, promotion) {
-            const mv = game.move({ from, to, promotion });
-            if (!mv) return;
-            lastMove = { from, to };
-            deselect();
-            checkEnd();
-            if (!game.game_over() && game.turn() === 'b') aiMove();
+            const isCapture = game.get(to) !== null;
+
+            // Animate first, then execute
+            animateMove(from, to, () => {
+                const mv = game.move({ from, to, promotion });
+                if (!mv) return;
+                lastMove = { from, to };
+                selected = null;
+                moves = [];
+
+                // Sound
+                if (game.in_check()) beep(880, 0.12, 'sine');
+                else if (isCapture) beep(300, 0.1, 'square');
+                else beep(600, 0.06, 'triangle');
+
+                render();
+                checkEnd();
+                if (!game.game_over() && game.turn() === 'b') aiMove();
+            });
         }
 
-        // Promotion
+        // ── Promotion ──────────────────────────────────────────
         function showPromo(from, to) {
             const opts = $('promoOpts');
             opts.innerHTML = '';
@@ -402,16 +703,21 @@
             $('promoOverlay').classList.add('show');
         }
 
-        // AI
+        // ── AI ─────────────────────────────────────────────────
         async function aiMove() {
             thinking = true;
             render();
-            await new Promise(r => setTimeout(r, 250));
+            await new Promise(r => setTimeout(r, 200));
 
-            const mv = bestMove(DEPTH);
+            const mv = bestMove(searchDepth);
             if (mv) {
+                const isCapture = game.get(mv.to) !== null;
                 game.move(mv);
                 lastMove = { from: mv.from, to: mv.to };
+
+                if (game.in_check()) beep(880, 0.12, 'sine');
+                else if (isCapture) beep(300, 0.1, 'square');
+                else beep(600, 0.06, 'triangle');
             }
 
             thinking = false;
@@ -422,11 +728,9 @@
         function bestMove(depth) {
             const allMoves = game.moves({ verbose: true });
             if (!allMoves.length) return null;
-
             orderMoves(allMoves);
             let best = allMoves[0];
             let bestVal = -Infinity;
-
             for (const mv of allMoves) {
                 game.move(mv);
                 const val = -negamax(depth - 1, -Infinity, Infinity);
@@ -438,11 +742,9 @@
 
         function negamax(depth, alpha, beta) {
             if (depth === 0 || game.game_over()) return evaluate();
-
             const allMoves = game.moves({ verbose: true });
             orderMoves(allMoves);
             let max = -Infinity;
-
             for (const mv of allMoves) {
                 game.move(mv);
                 const val = -negamax(depth - 1, -beta, -alpha);
@@ -468,11 +770,9 @@
         function evaluate() {
             if (game.in_checkmate()) return -50000;
             if (game.in_draw()) return 0;
-
             const turn = game.turn();
             let score = 0;
             const board = game.board();
-
             for (let r = 0; r < 8; r++) {
                 for (let c = 0; c < 8; c++) {
                     const pc = board[r][c];
@@ -484,7 +784,7 @@
             return score;
         }
 
-        // Game end
+        // ── Game end ───────────────────────────────────────────
         function checkEnd() {
             if (!game.game_over()) return;
             let title, msg;
@@ -500,10 +800,11 @@
             }
             $('goTitle').textContent = title;
             $('goMsg').textContent = msg;
-            $('gameOver').classList.add('show');
+            setTimeout(() => $('gameOver').classList.add('show'), 300);
+            beep(title === 'You Won!' ? 520 : 260, 0.3, 'sine');
         }
 
-        // Undo (player + computer)
+        // ── Undo ───────────────────────────────────────────────
         function undo() {
             if (thinking || game.history().length < 2) return;
             game.undo();
@@ -519,15 +820,71 @@
             moves = [];
             lastMove = null;
             thinking = false;
+            $('gameOver').classList.remove('show');
             render();
         }
 
-        // Wire up controls
-        $('undoBtn').addEventListener('click', undo);
-        $('newBtn').addEventListener('click', newGame);
-        $('goBtn').addEventListener('click', () => { $('gameOver').classList.remove('show'); newGame(); });
+        function flipBoard() {
+            flipped = !flipped;
+            buildBoard();
+            render();
+        }
 
-        // Init
+        // ── Settings ───────────────────────────────────────────
+        function openSettings() {
+            $('settingsBackdrop').classList.add('open');
+            $('settingsPanel').classList.add('open');
+        }
+
+        function closeSettings() {
+            $('settingsBackdrop').classList.remove('open');
+            $('settingsPanel').classList.remove('open');
+        }
+
+        // Difficulty
+        $('diffControl').addEventListener('click', e => {
+            const btn = e.target.closest('.seg-btn');
+            if (!btn) return;
+            $('diffControl').querySelectorAll('.seg-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            searchDepth = parseInt(btn.dataset.d);
+            saveSettings();
+        });
+
+        // Sound toggle
+        $('soundToggle').addEventListener('click', () => {
+            soundOn = !soundOn;
+            $('soundToggle').classList.toggle('on', soundOn);
+            saveSettings();
+        });
+
+        // Coords toggle
+        $('coordToggle').addEventListener('click', () => {
+            showCoords = !showCoords;
+            $('coordToggle').classList.toggle('on', showCoords);
+            boardEl.classList.toggle('no-coords', !showCoords);
+            saveSettings();
+        });
+
+        // ── Init settings UI state ─────────────────────────────
+        function initSettingsUI() {
+            $('diffControl').querySelectorAll('.seg-btn').forEach(b => {
+                b.classList.toggle('active', parseInt(b.dataset.d) === searchDepth);
+            });
+            $('soundToggle').classList.toggle('on', soundOn);
+            $('coordToggle').classList.toggle('on', showCoords);
+        }
+
+        // ── Wire up ────────────────────────────────────────────
+        $('undoBtn').addEventListener('click', undo);
+        $('flipBtn').addEventListener('click', flipBoard);
+        $('newBtn').addEventListener('click', newGame);
+        $('settingsBtn').addEventListener('click', openSettings);
+        $('settingsBackdrop').addEventListener('click', closeSettings);
+        $('goBtn').addEventListener('click', newGame);
+
+        // ── Start ──────────────────────────────────────────────
+        initSettingsUI();
         buildBoard();
         render();
     })();
