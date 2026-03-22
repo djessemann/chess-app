@@ -123,11 +123,12 @@
         }
 
         .pc {
-            font-size: calc(var(--board-size) / 10.5);
-            line-height: 1;
+            width: 80%;
+            height: 80%;
             pointer-events: none;
             filter: drop-shadow(0 1px 1px rgba(0,0,0,0.2));
             z-index: 1;
+            object-fit: contain;
         }
 
         .pc.anim {
@@ -398,9 +399,29 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
     <script>
     (() => {
-        const P = {
+        // Unicode for small captured piece display
+        const PU = {
             K:'♔', Q:'♕', R:'♖', B:'♗', N:'♘', P:'♙',
             k:'♚', q:'♛', r:'♜', b:'♝', n:'♞', p:'♟'
+        };
+
+        // SVG piece images (Cburnett, public domain via Wikimedia)
+        const WK = 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg';
+        const WQ = 'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg';
+        const WR = 'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg';
+        const WB = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg';
+        const WN = 'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg';
+        const WP = 'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg';
+        const BK = 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg';
+        const BQ = 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg';
+        const BR = 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg';
+        const BB = 'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg';
+        const BN = 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg';
+        const BP = 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg';
+
+        const PIECE_SRC = {
+            wk: WK, wq: WQ, wr: WR, wb: WB, wn: WN, wp: WP,
+            bk: BK, bq: BQ, br: BR, bb: BB, bn: BN, bp: BP
         };
 
         const VAL = { p:100, n:320, b:330, r:500, q:900, k:20000 };
@@ -524,12 +545,14 @@
 
                     let pcEl = sq.querySelector('.pc');
                     if (piece) {
+                        const src = PIECE_SRC[piece.color + piece.type];
                         if (!pcEl) {
-                            pcEl = document.createElement('span');
+                            pcEl = document.createElement('img');
                             pcEl.className = 'pc';
+                            pcEl.draggable = false;
                             sq.appendChild(pcEl);
                         }
-                        pcEl.textContent = P[piece.color === 'w' ? piece.type.toUpperCase() : piece.type];
+                        if (pcEl.src !== src) pcEl.src = src;
                     } else if (pcEl) {
                         pcEl.remove();
                     }
@@ -612,8 +635,8 @@
             byCapturedByBlack.sort((a,b) => order[a] - order[b]);
 
             // Display: show the pieces each player captured
-            const yourCaptures = byCapturedByWhite.map(p => P[p]).join('');
-            const compCaptures = byCapturedByBlack.map(p => P[p.toUpperCase()]).join('');
+            const yourCaptures = byCapturedByWhite.map(p => PU[p]).join('');
+            const compCaptures = byCapturedByBlack.map(p => PU[p.toUpperCase()]).join('');
 
             const yourMat = byCapturedByWhite.reduce((s,p) => s + VAL[p], 0);
             const compMat = byCapturedByBlack.reduce((s,p) => s + VAL[p], 0);
@@ -693,7 +716,12 @@
             for (const pc of ['q','r','b','n']) {
                 const btn = document.createElement('div');
                 btn.className = 'promo-btn';
-                btn.textContent = P[pc.toUpperCase()];
+                const img = document.createElement('img');
+                img.src = PIECE_SRC['w' + pc];
+                img.style.width = '80%';
+                img.style.height = '80%';
+                img.draggable = false;
+                btn.appendChild(img);
                 btn.addEventListener('click', () => {
                     $('promoOverlay').classList.remove('show');
                     doMove(from, to, pc);
