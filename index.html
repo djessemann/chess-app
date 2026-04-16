@@ -14,7 +14,7 @@
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Xanh+Mono:ital@0;1&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap">
     <title>Chess</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -45,13 +45,15 @@
             /* Portrait default. Media queries override for landscape / tablet. */
             --board-size: min(92vw, calc(100dvh - 220px), 520px);
             --focus: 0 0 0 3px rgba(91, 122, 47, 0.55);
-            --font-body: 'Xanh Mono', ui-monospace, 'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
+            --font-body: 'Space Mono', ui-monospace, 'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
         }
 
         html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
         body {
             font-family: var(--font-body);
+            font-weight: 700;
+            text-transform: lowercase;
             background: var(--bg);
             color: var(--text);
             height: 100dvh;
@@ -101,8 +103,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.04em;
             font-size: 14px;
         }
 
@@ -202,6 +203,7 @@
             position: absolute;
             font-size: 13px;
             font-style: italic;
+            font-weight: 400;
             pointer-events: none;
             opacity: 0.6;
         }
@@ -218,6 +220,7 @@
             min-height: 22px;
             text-align: center;
             font-style: italic;
+            font-weight: 400;
         }
         #status.check { color: #b23b3b; font-style: normal; letter-spacing: 0.04em; }
 
@@ -233,8 +236,7 @@
         }
         #moveList h3 {
             font-size: 13px;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
+            letter-spacing: 0.08em;
             color: var(--muted);
             padding: 8px 12px 6px;
         }
@@ -253,7 +255,7 @@
             padding: 2px 4px;
             border-radius: 6px;
         }
-        .move-row .num { color: var(--muted); font-size: 13px; text-align: right; font-style: italic; }
+        .move-row .num { color: var(--muted); font-size: 13px; text-align: right; font-style: italic; font-weight: 400; }
         .move-row .san {
             padding: 4px 8px;
             border-radius: 5px;
@@ -270,6 +272,7 @@
             text-align: center;
             padding: 24px 12px;
             font-style: italic;
+            font-weight: 400;
         }
 
         /* Controls */
@@ -283,8 +286,7 @@
             flex: 1;
             padding: 12px 0;
             font-size: 16px;
-            letter-spacing: 0.08em;
-            text-transform: uppercase;
+            letter-spacing: 0.04em;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -293,6 +295,7 @@
             min-height: 48px;
             transition: transform 120ms ease-out, opacity 120ms, background 120ms;
             font-family: inherit;
+            font-weight: inherit;
         }
         .btn:active { transform: scale(0.96); }
         .btn:disabled { opacity: 0.35; cursor: default; }
@@ -351,9 +354,8 @@
             font-size: 29px;
             letter-spacing: 0.02em;
             text-wrap: balance;
-            font-weight: 400;
         }
-        .modal p { color: var(--muted); margin-bottom: 20px; font-size: 17px; font-style: italic; text-wrap: pretty; }
+        .modal p { color: var(--muted); margin-bottom: 20px; font-size: 17px; font-style: italic; font-weight: 400; text-wrap: pretty; }
 
         .modal .btn { padding: 12px 24px; width: auto; min-width: 140px; }
         .modal .btn.pri { background: var(--accent); color: #fff; }
@@ -385,9 +387,7 @@
         .title-icon { width: 96px; height: 96px; border-radius: 20px; }
         .title-brand h1 {
             font-size: 53px;
-            font-weight: 400;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
+            letter-spacing: 0.02em;
         }
         .title-sub {
             color: var(--muted);
@@ -395,6 +395,7 @@
             text-align: center;
             margin-bottom: 12px;
             font-style: italic;
+            font-weight: 400;
             letter-spacing: 0.02em;
         }
         .title-step { display: flex; flex-direction: column; gap: 4px; }
@@ -420,7 +421,7 @@
         .title-btn:active { transform: scale(0.98); }
         .title-btn:focus-visible { outline: none; box-shadow: var(--focus); }
         .title-btn-title { font-size: 20px; letter-spacing: 0.04em; }
-        .title-btn-sub { font-size: 16px; color: var(--muted); font-style: italic; }
+        .title-btn-sub { font-size: 16px; color: var(--muted); font-style: italic; font-weight: 400; }
         .title-diff {
             align-self: center;
             margin-bottom: 8px;
@@ -484,10 +485,8 @@
         }
         .sheet-header h3 {
             font-size: 16px;
-            text-transform: uppercase;
-            letter-spacing: 0.16em;
+            letter-spacing: 0.06em;
             color: var(--muted);
-            font-weight: 400;
         }
         .sheet-close {
             background: transparent;
@@ -521,14 +520,14 @@
         .seg-btn {
             padding: 8px 16px;
             font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.04em;
             border: none;
             cursor: pointer;
             background: transparent;
             color: var(--muted);
             transition: background 120ms, color 120ms;
             font-family: inherit;
+            font-weight: inherit;
         }
         .seg-btn.active { background: var(--accent); color: #fff; }
         .seg-btn:focus-visible { outline: none; box-shadow: inset var(--focus); }
