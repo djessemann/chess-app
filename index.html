@@ -274,26 +274,27 @@
 
         .btn {
             flex: 1;
-            padding: 10px 0;
+            padding: 12px 0;
             font-size: 16px;
             letter-spacing: 0.04em;
-            border: 2px solid var(--text);
+            border: none;
             border-radius: 0;
             cursor: pointer;
             background: var(--card);
             color: var(--text);
             min-height: 48px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.12);
             transition: transform 120ms ease-out, opacity 120ms, background 120ms;
             font-family: inherit;
             font-weight: inherit;
         }
         .btn:active { transform: scale(0.96); }
-        .btn:disabled { opacity: 0.35; cursor: default; }
+        .btn:disabled { opacity: 0.35; cursor: default; box-shadow: none; }
         .btn:disabled:active { transform: none; }
-        .btn.pri { background: var(--accent); color: #fff; border-color: var(--text); }
+        .btn.pri { background: var(--accent); color: #fff; }
         .btn:hover:not(:disabled) { background: var(--card-hi); }
         .btn.pri:hover:not(:disabled) { background: #6f9239; }
-        .btn:focus-visible { outline: none; box-shadow: var(--focus); }
+        .btn:focus-visible { outline: none; box-shadow: var(--focus), 0 1px 2px rgba(0,0,0,0.12); }
 
         /* Floating restart button */
         .gear {
@@ -302,18 +303,19 @@
             right: max(12px, env(safe-area-inset-right));
             width: 48px; height: 48px;
             border-radius: 0;
-            border: 2px solid var(--text);
+            border: none;
             background: var(--card);
             color: var(--text);
             cursor: pointer;
             display: grid;
             place-items: center;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.12);
             z-index: 5;
             transition: transform 120ms ease-out, background 120ms;
         }
         .gear:hover { background: var(--card-hi); }
         .gear:active { transform: scale(0.94); }
-        .gear:focus-visible { outline: none; box-shadow: var(--focus), 0 4px 12px rgba(0,0,0,0.4); }
+        .gear:focus-visible { outline: none; box-shadow: var(--focus), 0 1px 2px rgba(0,0,0,0.12); }
         .gear svg { width: 26px; height: 26px; fill: currentColor; }
 
         /* Overlays — hard cuts, no fade. */
@@ -331,8 +333,9 @@
         .modal {
             background: var(--card);
             padding: 28px 32px;
-            border: 2px solid var(--text);
+            border: none;
             border-radius: 0;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.18);
             text-align: center;
             max-width: 420px;
             width: 100%;
@@ -346,7 +349,7 @@
         }
         .modal p { color: var(--muted); margin-bottom: 20px; font-size: 17px; font-style: italic; font-weight: 400; text-wrap: pretty; }
 
-        .modal .btn { padding: 10px 22px; width: auto; min-width: 140px; }
+        .modal .btn { padding: 12px 24px; width: auto; min-width: 140px; }
         .modal .btn.pri { background: var(--accent); color: #fff; }
         .modal .btn.pri:hover:not(:disabled) { background: #6f9239; }
         .modal-actions {
@@ -395,11 +398,12 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 2px;
-            padding: 14px 18px;
+            padding: 16px 20px;
             background: var(--card);
             color: var(--text);
-            border: 2px solid var(--text);
+            border: none;
             border-radius: 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.12);
             cursor: pointer;
             font-family: inherit;
             text-align: left;
@@ -429,8 +433,9 @@
             display: grid;
             place-items: center;
             background: var(--light);
-            border: 2px solid var(--text);
+            border: none;
             border-radius: 0;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.12);
             cursor: pointer;
             transition: transform 120ms;
         }
@@ -440,23 +445,24 @@
 
         .seg-control {
             display: flex;
+            gap: 8px;
         }
         .seg-btn {
-            padding: 8px 16px;
+            padding: 10px 18px;
             font-size: 14px;
             letter-spacing: 0.04em;
-            border: 2px solid var(--text);
+            border: none;
             border-radius: 0;
             cursor: pointer;
             background: var(--card);
             color: var(--text);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.12);
             transition: background 120ms, color 120ms;
             font-family: inherit;
             font-weight: inherit;
         }
-        .seg-btn + .seg-btn { border-left: none; }
         .seg-btn.active { background: var(--accent); color: #fff; }
-        .seg-btn:focus-visible { outline: none; box-shadow: inset var(--focus); }
+        .seg-btn:focus-visible { outline: none; box-shadow: var(--focus), 0 1px 2px rgba(0,0,0,0.12); }
 
         /* Thinking dots */
         .dots { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
