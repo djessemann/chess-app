@@ -2,7 +2,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="theme-color" content="#1a1a1a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Chess">
+    <link rel="manifest" href="manifest.webmanifest">
+    <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
+    <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
     <title>Chess</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -31,7 +40,8 @@
             justify-content: center;
             overflow: hidden;
             gap: 6px;
-            padding: 8px;
+            padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
+            -webkit-touch-callout: none;
         }
 
         /* Player bars */
@@ -396,7 +406,7 @@
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chess.js/0.10.3/chess.min.js"></script>
+    <script src="vendor/chess.js"></script>
     <script>
     (() => {
         // Unicode for small captured piece display
@@ -405,23 +415,14 @@
             k:'♚', q:'♛', r:'♜', b:'♝', n:'♞', p:'♟'
         };
 
-        // SVG piece images (Cburnett, public domain via Wikimedia)
-        const WK = 'https://upload.wikimedia.org/wikipedia/commons/4/42/Chess_klt45.svg';
-        const WQ = 'https://upload.wikimedia.org/wikipedia/commons/1/15/Chess_qlt45.svg';
-        const WR = 'https://upload.wikimedia.org/wikipedia/commons/7/72/Chess_rlt45.svg';
-        const WB = 'https://upload.wikimedia.org/wikipedia/commons/b/b1/Chess_blt45.svg';
-        const WN = 'https://upload.wikimedia.org/wikipedia/commons/7/70/Chess_nlt45.svg';
-        const WP = 'https://upload.wikimedia.org/wikipedia/commons/4/45/Chess_plt45.svg';
-        const BK = 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Chess_kdt45.svg';
-        const BQ = 'https://upload.wikimedia.org/wikipedia/commons/4/47/Chess_qdt45.svg';
-        const BR = 'https://upload.wikimedia.org/wikipedia/commons/f/ff/Chess_rdt45.svg';
-        const BB = 'https://upload.wikimedia.org/wikipedia/commons/9/98/Chess_bdt45.svg';
-        const BN = 'https://upload.wikimedia.org/wikipedia/commons/e/ef/Chess_ndt45.svg';
-        const BP = 'https://upload.wikimedia.org/wikipedia/commons/c/c7/Chess_pdt45.svg';
-
+        // Local piece SVGs (Cburnett set, CC BY-SA 3.0). See assets/pieces/LICENSE.txt.
         const PIECE_SRC = {
-            wk: WK, wq: WQ, wr: WR, wb: WB, wn: WN, wp: WP,
-            bk: BK, bq: BQ, br: BR, bb: BB, bn: BN, bp: BP
+            wk: 'assets/pieces/wK.svg', wq: 'assets/pieces/wQ.svg',
+            wr: 'assets/pieces/wR.svg', wb: 'assets/pieces/wB.svg',
+            wn: 'assets/pieces/wN.svg', wp: 'assets/pieces/wP.svg',
+            bk: 'assets/pieces/bK.svg', bq: 'assets/pieces/bQ.svg',
+            br: 'assets/pieces/bR.svg', bb: 'assets/pieces/bB.svg',
+            bn: 'assets/pieces/bN.svg', bp: 'assets/pieces/bP.svg'
         };
 
         const VAL = { p:100, n:320, b:330, r:500, q:900, k:20000 };
@@ -916,6 +917,13 @@
         buildBoard();
         render();
     })();
+
+    // Service worker registration (offline support). Runs after the game boots.
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        });
+    }
     </script>
 </body>
 </html>
