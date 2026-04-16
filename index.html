@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-    <meta name="theme-color" content="#1a1a1a">
+    <meta name="theme-color" content="#f2ece0">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -34,16 +34,17 @@
             /* A warmer, more paper-like board pairs better with the serif-mono type. */
             --light: #ece0c4;
             --dark: #a88867;
-            --bg: #181614;
-            --card: #24221f;
-            --card-hi: #2d2a26;
-            --accent: #7fa650;
-            --text: #ece7df;
-            --muted: #8a857d;
-            --hairline: rgba(255,255,255,0.06);
+            /* Light theme: cream paper, dark type. */
+            --bg: #f2ece0;
+            --card: #e5dcc8;
+            --card-hi: #dacfb6;
+            --accent: #5b7a2f;
+            --text: #2a251e;
+            --muted: #6d655a;
+            --hairline: rgba(0,0,0,0.08);
             /* Portrait default. Media queries override for landscape / tablet. */
             --board-size: min(92vw, calc(100dvh - 220px), 520px);
-            --focus: 0 0 0 3px rgba(127, 166, 80, 0.55);
+            --focus: 0 0 0 3px rgba(91, 122, 47, 0.55);
             --font-body: 'Xanh Mono', ui-monospace, 'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
         }
 
@@ -92,8 +93,8 @@
             align-items: center;
             justify-content: space-between;
             padding: 6px 4px;
-            font-size: 14px;
-            min-height: 32px;
+            font-size: 17px;
+            min-height: 38px;
         }
 
         .player-info {
@@ -102,19 +103,18 @@
             gap: 8px;
             text-transform: uppercase;
             letter-spacing: 0.08em;
-            font-size: 12px;
+            font-size: 14px;
         }
 
         .turn-dot {
-            width: 8px; height: 8px;
+            width: 10px; height: 10px;
             border-radius: 50%;
-            background: #444;
-            transition: background 200ms;
+            background: rgba(0,0,0,0.22);
         }
-        .turn-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(127,166,80,0.5); }
+        .turn-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(91,122,47,0.45); }
 
         .captured-pieces {
-            font-size: 14px;
+            font-size: 17px;
             opacity: 0.75;
             letter-spacing: -1px;
             /* Unicode chess glyphs: fall out of Xanh Mono back to a system font that has them. */
@@ -122,7 +122,7 @@
         }
 
         .mat-diff {
-            font-size: 11px;
+            font-size: 13px;
             color: var(--muted);
             margin-left: 4px;
         }
@@ -136,7 +136,7 @@
             aspect-ratio: 1;
             border-radius: 4px;
             overflow: hidden;
-            box-shadow: 0 0 0 1px rgba(0,0,0,0.3), 0 10px 30px rgba(0,0,0,0.55);
+            box-shadow: 0 0 0 1px rgba(0,0,0,0.18), 0 6px 20px rgba(0,0,0,0.18);
             touch-action: none; /* we handle all pointer gestures manually */
             user-select: none;
         }
@@ -180,7 +180,7 @@
             width: 82%;
             height: 82%;
             pointer-events: none;
-            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.25));
+            filter: drop-shadow(0 1px 1px rgba(0,0,0,0.18));
             z-index: 1;
             object-fit: contain;
         }
@@ -200,7 +200,7 @@
 
         .coord {
             position: absolute;
-            font-size: 11px;
+            font-size: 13px;
             font-style: italic;
             pointer-events: none;
             opacity: 0.6;
@@ -213,13 +213,13 @@
 
         /* Status */
         #status {
-            font-size: 13px;
+            font-size: 16px;
             color: var(--muted);
-            min-height: 20px;
+            min-height: 22px;
             text-align: center;
             font-style: italic;
         }
-        #status.check { color: #e66; font-style: normal; letter-spacing: 0.04em; }
+        #status.check { color: #b23b3b; font-style: normal; letter-spacing: 0.04em; }
 
         /* Move list */
         #moveList {
@@ -232,7 +232,7 @@
             min-height: 0;
         }
         #moveList h3 {
-            font-size: 11px;
+            font-size: 13px;
             text-transform: uppercase;
             letter-spacing: 0.16em;
             color: var(--muted);
@@ -249,11 +249,11 @@
             grid-template-columns: 32px 1fr 1fr;
             align-items: center;
             gap: 4px;
-            font-size: 13px;
+            font-size: 16px;
             padding: 2px 4px;
             border-radius: 6px;
         }
-        .move-row .num { color: var(--muted); font-size: 11px; text-align: right; font-style: italic; }
+        .move-row .num { color: var(--muted); font-size: 13px; text-align: right; font-style: italic; }
         .move-row .san {
             padding: 4px 8px;
             border-radius: 5px;
@@ -265,7 +265,7 @@
         }
         .move-row .san.current { background: var(--accent); color: #fff; }
         .move-empty {
-            font-size: 12px;
+            font-size: 14px;
             color: var(--muted);
             text-align: center;
             padding: 24px 12px;
@@ -282,7 +282,7 @@
         .btn {
             flex: 1;
             padding: 12px 0;
-            font-size: 13px;
+            font-size: 16px;
             letter-spacing: 0.08em;
             text-transform: uppercase;
             border: none;
@@ -290,7 +290,7 @@
             cursor: pointer;
             background: var(--card);
             color: var(--text);
-            min-height: 44px;
+            min-height: 48px;
             transition: transform 120ms ease-out, opacity 120ms, background 120ms;
             font-family: inherit;
         }
@@ -299,7 +299,7 @@
         .btn:disabled:active { transform: none; }
         .btn.pri { background: var(--accent); color: #fff; }
         .btn:hover:not(:disabled) { background: var(--card-hi); }
-        .btn.pri:hover:not(:disabled) { background: #8db95c; }
+        .btn.pri:hover:not(:disabled) { background: #6f9239; }
         .btn:focus-visible { outline: none; box-shadow: var(--focus); }
 
         /* Floating settings gear */
@@ -307,7 +307,7 @@
             position: fixed;
             top: max(12px, env(safe-area-inset-top));
             right: max(12px, env(safe-area-inset-right));
-            width: 44px; height: 44px;
+            width: 48px; height: 48px;
             border-radius: 50%;
             border: none;
             background: var(--card);
@@ -315,54 +315,49 @@
             cursor: pointer;
             display: grid;
             place-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
             z-index: 5;
             transition: transform 120ms ease-out, background 120ms;
         }
         .gear:hover { background: var(--card-hi); }
         .gear:active { transform: scale(0.94); }
         .gear:focus-visible { outline: none; box-shadow: var(--focus), 0 4px 12px rgba(0,0,0,0.4); }
-        .gear svg { width: 22px; height: 22px; fill: currentColor; }
+        .gear svg { width: 26px; height: 26px; fill: currentColor; }
 
-        /* Overlays */
+        /* Overlays — hard cuts, no fade. */
         .overlay {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.7);
-            display: flex;
+            background: rgba(40,34,24,0.5);
+            display: none;
             align-items: center;
             justify-content: center;
             z-index: 10;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.2s, visibility 0.2s;
             padding: 24px;
         }
-        .overlay.show { opacity: 1; visibility: visible; }
+        .overlay.show { display: flex; }
 
         .modal {
             background: var(--card);
             padding: 28px 32px;
             border-radius: 16px;
             text-align: center;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.55);
-            transform: scale(0.95);
-            transition: transform 0.2s;
-            max-width: 360px;
+            box-shadow: 0 16px 48px rgba(0,0,0,0.25);
+            max-width: 420px;
             width: 100%;
         }
-        .overlay.show .modal { transform: scale(1); }
 
         .modal h2 {
             margin-bottom: 6px;
-            font-size: 24px;
+            font-size: 29px;
             letter-spacing: 0.02em;
             text-wrap: balance;
             font-weight: 400;
         }
-        .modal p { color: var(--muted); margin-bottom: 20px; font-size: 14px; font-style: italic; text-wrap: pretty; }
+        .modal p { color: var(--muted); margin-bottom: 20px; font-size: 17px; font-style: italic; text-wrap: pretty; }
 
-        .modal .btn { padding: 12px 24px; width: auto; min-width: 120px; }
+        .modal .btn { padding: 12px 24px; width: auto; min-width: 140px; }
         .modal .btn.pri { background: var(--accent); color: #fff; }
-        .modal .btn.pri:hover:not(:disabled) { background: #8db95c; }
+        .modal .btn.pri:hover:not(:disabled) { background: #6f9239; }
         .modal-actions {
             display: flex;
             gap: 8px;
@@ -372,7 +367,6 @@
 
         /* Title screen */
         .overlay.title { background: var(--bg); }
-        .overlay.title.show { transition-duration: 0.3s; }
         .title-card {
             width: 100%;
             max-width: 380px;
@@ -390,14 +384,14 @@
         }
         .title-icon { width: 96px; height: 96px; border-radius: 20px; }
         .title-brand h1 {
-            font-size: 44px;
+            font-size: 53px;
             font-weight: 400;
             letter-spacing: 0.04em;
             text-transform: uppercase;
         }
         .title-sub {
             color: var(--muted);
-            font-size: 13px;
+            font-size: 16px;
             text-align: center;
             margin-bottom: 12px;
             font-style: italic;
@@ -425,29 +419,18 @@
         .title-btn:hover { background: var(--card-hi); }
         .title-btn:active { transform: scale(0.98); }
         .title-btn:focus-visible { outline: none; box-shadow: var(--focus); }
-        .title-btn-title { font-size: 17px; letter-spacing: 0.04em; }
-        .title-btn-sub { font-size: 13px; color: var(--muted); font-style: italic; }
+        .title-btn-title { font-size: 20px; letter-spacing: 0.04em; }
+        .title-btn-sub { font-size: 16px; color: var(--muted); font-style: italic; }
         .title-diff {
             align-self: center;
             margin-bottom: 8px;
         }
-        .title-diff .seg-btn { padding: 10px 22px; font-size: 14px; }
+        .title-diff .seg-btn { padding: 10px 22px; font-size: 17px; }
         .title-actions {
             display: flex;
             gap: 8px;
         }
         .title-actions .btn { flex: 1; min-height: 48px; }
-
-        /* 2P hotseat: board spins 180° between turns; at spin-end we toggle
-           the internal flipped state and reset the transform, so the spin
-           and the state change are visually continuous. */
-        #board.spinning {
-            transition-property: transform;
-            transition-duration: 320ms;
-            transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
-            transform: rotate(180deg);
-        }
-        .player-bar.fading { opacity: 0; transition: opacity 200ms; }
 
         .promo-options { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
 
@@ -465,15 +448,14 @@
         .promo-btn:focus-visible { outline: none; box-shadow: var(--focus); }
         .promo-btn img { width: 80%; height: 80%; }
 
-        /* Settings sheet (mobile: bottom; tablet+: centered modal) */
+        /* Settings sheet (mobile: bottom; tablet+: centered modal). No fade — hard cut. */
         .settings-backdrop {
             position: fixed; inset: 0;
-            background: rgba(0,0,0,0.5);
+            background: rgba(40,34,24,0.35);
             z-index: 19;
-            opacity: 0; visibility: hidden;
-            transition: opacity 0.2s, visibility 0.2s;
+            display: none;
         }
-        .settings-backdrop.open { opacity: 1; visibility: visible; }
+        .settings-backdrop.open { display: block; }
 
         .settings-panel {
             position: fixed;
@@ -483,16 +465,13 @@
             padding: 8px 24px 20px;
             padding-bottom: max(20px, env(safe-area-inset-bottom));
             z-index: 20;
-            opacity: 0;
-            visibility: hidden;
-            transform: translateY(100%);
-            transition: transform 0.25s cubic-bezier(0.2, 0, 0, 1), opacity 0.2s, visibility 0.25s;
+            display: none;
         }
-        .settings-panel.open { opacity: 1; visibility: visible; transform: translateY(0); }
+        .settings-panel.open { display: block; }
 
         .sheet-handle {
             width: 36px; height: 4px;
-            background: rgba(255,255,255,0.2);
+            background: rgba(0,0,0,0.18);
             border-radius: 2px;
             margin: 6px auto 12px;
         }
@@ -504,7 +483,7 @@
             padding-bottom: 4px;
         }
         .sheet-header h3 {
-            font-size: 13px;
+            font-size: 16px;
             text-transform: uppercase;
             letter-spacing: 0.16em;
             color: var(--muted);
@@ -515,7 +494,7 @@
             border: none;
             color: var(--muted);
             cursor: pointer;
-            font-size: 22px;
+            font-size: 26px;
             line-height: 1;
             padding: 4px 8px;
             border-radius: 6px;
@@ -528,20 +507,20 @@
             justify-content: space-between;
             align-items: center;
             padding: 14px 0;
-            min-height: 44px;
+            min-height: 48px;
         }
         .setting-row + .setting-row { border-top: 1px solid var(--hairline); }
-        .setting-label { font-size: 15px; }
+        .setting-label { font-size: 18px; }
 
         .seg-control {
             display: flex;
-            background: rgba(255,255,255,0.06);
+            background: rgba(0,0,0,0.06);
             border-radius: 8px;
             overflow: hidden;
         }
         .seg-btn {
             padding: 8px 16px;
-            font-size: 12px;
+            font-size: 14px;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             border: none;
@@ -557,7 +536,7 @@
         .toggle {
             width: 50px; height: 30px;
             border-radius: 15px;
-            background: rgba(255,255,255,0.12);
+            background: rgba(0,0,0,0.16);
             cursor: pointer;
             position: relative;
             border: none;
@@ -579,8 +558,10 @@
         .toggle:focus-visible { outline: none; box-shadow: var(--focus); }
 
         /* Quit button fills its settings row. */
-        .quit-btn { width: 100%; flex: none; background: rgba(230,80,80,0.14); color: #f5a0a0; }
-        .quit-btn:hover:not(:disabled) { background: rgba(230,80,80,0.22); }
+        .quit-btn { width: 100%; flex: none; background: rgba(178,59,59,0.12); color: #8a2e2e; }
+        .quit-btn:hover:not(:disabled) { background: rgba(178,59,59,0.2); }
+        .quit-btn.confirm { background: #8a2e2e; color: #fff; }
+        .quit-btn.confirm:hover:not(:disabled) { background: #a03636; }
 
         /* Thinking dots */
         .dots { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
@@ -609,7 +590,7 @@
         /* Tablet portrait (iPad portrait): larger board, side-col still below */
         @media (min-width: 720px) and (orientation: portrait) {
             :root { --board-size: min(80vw, calc(100dvh - 280px), 680px); }
-            .player-bar { font-size: 16px; }
+            .player-bar { font-size: 19px; }
         }
 
         /* Tablet landscape (iPad landscape): two-column with move list */
@@ -621,7 +602,7 @@
                 height: var(--board-size);
                 justify-content: space-between;
             }
-            .player-bar { font-size: 15px; }
+            .player-bar { font-size: 18px; }
             #moveList { display: flex; flex: 1 1 auto; min-height: 0; }
             .settings-panel {
                 left: 50%;
@@ -672,7 +653,6 @@
             <div id="controls">
                 <button class="btn" id="undoBtn" disabled aria-label="Undo last move (U)">Undo</button>
                 <button class="btn" id="flipBtn" aria-label="Flip board (F)">Flip</button>
-                <button class="btn pri" id="newBtn" aria-label="New game — back to title (N)">New</button>
             </div>
         </div>
     </div>
@@ -826,7 +806,6 @@
         let showCoords = true;
         let hapticsOn = true;
         const sqCache = {};
-        const reducedMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
         // Load saved settings (persistent prefs, not game-specific)
         try {
@@ -872,10 +851,6 @@
                 mode = s.mode;
                 searchDepth = s.depth || 3;
                 flipped = !!s.flipped;
-                // In 2P hotseat, orientation is a function of whose turn it is. If a game was
-                // saved mid-rotation (or with legacy data), recompute so the mover always sees
-                // their pieces at the bottom.
-                if (mode === '2p' && !game.game_over()) flipped = (game.turn() === 'b');
                 const hist = game.history({ verbose: true });
                 if (hist.length) {
                     const last = hist[hist.length - 1];
@@ -1093,10 +1068,6 @@
             const minHist = mode === '2p' ? 1 : 2;
             $('undoBtn').disabled = thinking || animating || game.history().length < minHist;
 
-            // In 2P the board auto-rotates each ply, so a manual Flip is redundant and can
-            // desync orientation from whose turn it is. Hide it.
-            $('flipBtn').hidden = (mode === '2p');
-
             // Captured pieces
             updateCaptured();
 
@@ -1178,40 +1149,6 @@
             if (thinking || animating || game.game_over() || !mode) return false;
             // 1P: the human plays White only. 2P: both colors are human.
             return mode === '2p' || game.turn() === 'w';
-        }
-
-        // After a ply in 2P, spin the board so the new mover sees their pieces at the bottom.
-        // Rotating 180° and then toggling `flipped` with a re-render produces an identical
-        // visual frame — so we remove the transition and reset the transform invisibly.
-        function rotateForHotseat(done) {
-            if (mode !== '2p' || reducedMotion) {
-                flipped = (game.turn() === 'b');
-                buildBoard();
-                render();
-                saveGame();
-                if (done) done();
-                return;
-            }
-            animating = true;
-            boardEl.classList.add('spinning');
-            let settled = false;
-            const finish = e => {
-                // Ignore transitionend bubbles from child elements or other properties.
-                if (e && (e.target !== boardEl || e.propertyName !== 'transform')) return;
-                if (settled) return;
-                settled = true;
-                boardEl.removeEventListener('transitionend', finish);
-                boardEl.classList.remove('spinning');
-                flipped = (game.turn() === 'b');
-                buildBoard();
-                render();
-                // Persist post-rotation orientation so a mid-rotation close restores correctly.
-                saveGame();
-                animating = false;
-                if (done) done();
-            };
-            boardEl.addEventListener('transitionend', finish);
-            setTimeout(finish, 400); // safety timeout
         }
 
         function squareAt(clientX, clientY) {
@@ -1379,11 +1316,7 @@
                 saveGame();
                 render();
                 if (game.game_over()) { checkEnd(); return; }
-                if (mode === '1p' && game.turn() === 'b') {
-                    aiMove();
-                } else if (mode === '2p') {
-                    rotateForHotseat();
-                }
+                if (mode === '1p' && game.turn() === 'b') aiMove();
             });
         }
 
@@ -1539,14 +1472,13 @@
 
         // ── Undo ───────────────────────────────────────────────
         function undo() {
-            if (thinking || animating || game.history().length < 2) return;
             // 1p: undo your move + AI's reply (2 plies). 2p: undo one ply.
             const plies = mode === '2p' ? 1 : 2;
+            if (thinking || animating || game.history().length < plies) return;
             for (let i = 0; i < plies && game.history().length; i++) game.undo();
             $('gameOver').classList.remove('show');
             const hist = game.history({ verbose: true });
             lastMove = hist.length ? { from: hist[hist.length-1].from, to: hist[hist.length-1].to } : null;
-            if (mode === '2p') flipped = (game.turn() === 'b');
             buildBoard();
             saveGame();
             haptic(15);
@@ -1568,6 +1500,8 @@
         function closeSettings() {
             $('settingsBackdrop').classList.remove('open');
             $('settingsPanel').classList.remove('open');
+            // Reset the quit-to-title confirmation if the panel is closed mid-confirm.
+            if (typeof resetQuitButton === 'function') resetQuitButton();
         }
 
         function setToggle(el, on) {
@@ -1678,13 +1612,34 @@
         // ── Wire up ────────────────────────────────────────────
         $('undoBtn').addEventListener('click', undo);
         $('flipBtn').addEventListener('click', flipBoard);
-        $('newBtn').addEventListener('click', showTitle);
         $('settingsBtn').addEventListener('click', openSettings);
         $('settingsBackdrop').addEventListener('click', closeSettings);
         $('settingsClose').addEventListener('click', closeSettings);
-        $('quitBtn').addEventListener('click', () => {
-            closeSettings();
-            showTitle();
+
+        // Quit to Title needs a confirmation: a first tap arms the button
+        // ("Tap again to confirm"), a second tap within 4s commits. Closing
+        // settings or letting the timer lapse resets it.
+        const quitBtn = $('quitBtn');
+        let quitArmed = false;
+        let quitTimer = null;
+        function resetQuitButton() {
+            quitArmed = false;
+            quitBtn.classList.remove('confirm');
+            quitBtn.textContent = 'Quit to Title';
+            if (quitTimer) { clearTimeout(quitTimer); quitTimer = null; }
+        }
+        quitBtn.addEventListener('click', () => {
+            if (quitArmed) {
+                resetQuitButton();
+                closeSettings();
+                showTitle();
+                return;
+            }
+            quitArmed = true;
+            quitBtn.classList.add('confirm');
+            quitBtn.textContent = 'Tap again to confirm';
+            haptic(10);
+            quitTimer = setTimeout(resetQuitButton, 4000);
         });
         $('goBtn').addEventListener('click', () => {
             // Play Again: same mode + (for 1p) same difficulty.
@@ -1697,7 +1652,7 @@
             showTitle();
         });
 
-        // Keyboard shortcuts (desktop/iPad w/ keyboard): N new, U undo, F flip, Esc close.
+        // Keyboard shortcuts (desktop/iPad w/ keyboard): U undo, F flip, Esc close.
         window.addEventListener('keydown', e => {
             if (e.metaKey || e.ctrlKey || e.altKey) return;
             const t = e.target;
@@ -1713,9 +1668,8 @@
             // Title screen swallows game shortcuts.
             if (titleEl.classList.contains('show')) return;
             const k = e.key.toLowerCase();
-            if (k === 'n') { showTitle(); }
-            else if (k === 'u') { undo(); }
-            else if (k === 'f' && mode !== '2p') { flipBoard(); }
+            if (k === 'u') { undo(); }
+            else if (k === 'f') { flipBoard(); }
         });
 
         // ── Start ──────────────────────────────────────────────
