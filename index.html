@@ -199,19 +199,6 @@
             will-change: transform;
         }
 
-        .coord {
-            position: absolute;
-            font-size: 13px;
-            font-style: italic;
-            font-weight: 400;
-            pointer-events: none;
-            opacity: 0.6;
-        }
-        .coord.file { bottom: 1px; right: 4px; }
-        .coord.rank { top: 2px; left: 4px; }
-        .sq.l .coord { color: var(--dark); }
-        .sq.d .coord { color: var(--light); }
-
         /* Status */
         #status {
             font-size: 16px;
@@ -283,11 +270,11 @@
 
         .btn {
             flex: 1;
-            padding: 12px 0;
+            padding: 10px 0;
             font-size: 16px;
             letter-spacing: 0.04em;
-            border: none;
-            border-radius: 8px;
+            border: 2px solid var(--text);
+            border-radius: 0;
             cursor: pointer;
             background: var(--card);
             color: var(--text);
@@ -299,25 +286,24 @@
         .btn:active { transform: scale(0.96); }
         .btn:disabled { opacity: 0.35; cursor: default; }
         .btn:disabled:active { transform: none; }
-        .btn.pri { background: var(--accent); color: #fff; }
+        .btn.pri { background: var(--accent); color: #fff; border-color: var(--text); }
         .btn:hover:not(:disabled) { background: var(--card-hi); }
         .btn.pri:hover:not(:disabled) { background: #6f9239; }
         .btn:focus-visible { outline: none; box-shadow: var(--focus); }
 
-        /* Floating settings gear */
+        /* Floating restart button */
         .gear {
             position: fixed;
             top: max(12px, env(safe-area-inset-top));
             right: max(12px, env(safe-area-inset-right));
             width: 48px; height: 48px;
-            border-radius: 50%;
-            border: none;
+            border-radius: 0;
+            border: 2px solid var(--text);
             background: var(--card);
             color: var(--text);
             cursor: pointer;
             display: grid;
             place-items: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.18);
             z-index: 5;
             transition: transform 120ms ease-out, background 120ms;
         }
@@ -341,9 +327,9 @@
         .modal {
             background: var(--card);
             padding: 28px 32px;
-            border-radius: 16px;
+            border: 2px solid var(--text);
+            border-radius: 0;
             text-align: center;
-            box-shadow: 0 16px 48px rgba(0,0,0,0.25);
             max-width: 420px;
             width: 100%;
         }
@@ -356,7 +342,7 @@
         }
         .modal p { color: var(--muted); margin-bottom: 20px; font-size: 17px; font-style: italic; font-weight: 400; text-wrap: pretty; }
 
-        .modal .btn { padding: 12px 24px; width: auto; min-width: 140px; }
+        .modal .btn { padding: 10px 22px; width: auto; min-width: 140px; }
         .modal .btn.pri { background: var(--accent); color: #fff; }
         .modal .btn.pri:hover:not(:disabled) { background: #6f9239; }
         .modal-actions {
@@ -405,11 +391,11 @@
             flex-direction: column;
             align-items: flex-start;
             gap: 2px;
-            padding: 16px 20px;
+            padding: 14px 18px;
             background: var(--card);
             color: var(--text);
-            border: none;
-            border-radius: 12px;
+            border: 2px solid var(--text);
+            border-radius: 0;
             cursor: pointer;
             font-family: inherit;
             text-align: left;
@@ -439,8 +425,8 @@
             display: grid;
             place-items: center;
             background: var(--light);
-            border: none;
-            border-radius: 10px;
+            border: 2px solid var(--text);
+            border-radius: 0;
             cursor: pointer;
             transition: transform 120ms;
         }
@@ -450,22 +436,21 @@
 
         .seg-control {
             display: flex;
-            background: rgba(0,0,0,0.06);
-            border-radius: 8px;
-            overflow: hidden;
         }
         .seg-btn {
             padding: 8px 16px;
             font-size: 14px;
             letter-spacing: 0.04em;
-            border: none;
+            border: 2px solid var(--text);
+            border-radius: 0;
             cursor: pointer;
-            background: transparent;
-            color: var(--muted);
+            background: var(--card);
+            color: var(--text);
             transition: background 120ms, color 120ms;
             font-family: inherit;
             font-weight: inherit;
         }
+        .seg-btn + .seg-btn { border-left: none; }
         .seg-btn.active { background: var(--accent); color: #fff; }
         .seg-btn:focus-visible { outline: none; box-shadow: inset var(--focus); }
 
@@ -591,7 +576,6 @@
                     <button class="seg-btn" data-d="4" role="radio">Hard</button>
                 </div>
                 <div class="title-actions">
-                    <button class="btn" id="titleBackBtn">Back</button>
                     <button class="btn pri" id="titleStartBtn">Start Game</button>
                 </div>
             </div>
@@ -774,19 +758,6 @@
                     const sq = document.createElement('div');
                     sq.className = `sq ${(dr + dc) % 2 === 0 ? 'l' : 'd'}`;
                     sq.dataset.s = name;
-
-                    if (c === 0) {
-                        const co = document.createElement('span');
-                        co.className = 'coord rank';
-                        co.textContent = 8 - dr;
-                        sq.appendChild(co);
-                    }
-                    if (r === 7) {
-                        const co = document.createElement('span');
-                        co.className = 'coord file';
-                        co.textContent = String.fromCharCode(97 + dc);
-                        sq.appendChild(co);
-                    }
 
                     boardEl.appendChild(sq);
                     sqCache[name] = sq;
@@ -1406,10 +1377,6 @@
             haptic(10);
         });
         $('mode2pBtn').addEventListener('click', () => { startGame('2p'); });
-        $('titleBackBtn').addEventListener('click', () => {
-            stepDiff.hidden = true;
-            stepMode.hidden = false;
-        });
         $('titleStartBtn').addEventListener('click', () => { startGame('1p'); });
 
         diffCtl.addEventListener('click', e => {
