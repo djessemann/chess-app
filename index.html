@@ -442,10 +442,12 @@
         let moves = [];
         let lastMove = null;
         let thinking = false;
+        let animating = false;
         let flipped = false;
         let searchDepth = 3;
         let soundOn = true;
         let showCoords = true;
+        const sqCache = {};
 
         // Load saved settings
         try {
@@ -470,7 +472,13 @@
         let audioCtx;
         function beep(freq, dur, type) {
             if (!soundOn) return;
-            if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            if (!audioCtx) {
+                const Ctor = window.AudioContext || window.webkitAudioContext;
+                if (!Ctor) return;
+                audioCtx = new Ctor();
+            }
+            // iOS Safari can leave the context suspended until a user gesture resumes it.
+            if (audioCtx.state === 'suspended') audioCtx.resume();
             const osc = audioCtx.createOscillator();
             const g = audioCtx.createGain();
             osc.type = type || 'sine';
@@ -492,6 +500,7 @@
 
         function buildBoard() {
             boardEl.innerHTML = '';
+            for (const k of Object.keys(sqCache)) delete sqCache[k];
             for (let r = 0; r < 8; r++) {
                 for (let c = 0; c < 8; c++) {
                     const dr = flipped ? 7 - r : r;
@@ -516,6 +525,7 @@
 
                     sq.addEventListener('click', () => tap(name));
                     boardEl.appendChild(sq);
+                    sqCache[name] = sq;
                 }
             }
             boardEl.classList.toggle('no-coords', !showCoords);
@@ -532,7 +542,7 @@
                     const dr = flipped ? 7 - r : r;
                     const dc = flipped ? 7 - c : c;
                     const name = String.fromCharCode(97 + dc) + (8 - dr);
-                    const sq = boardEl.querySelector(`[data-s="${name}"]`);
+                    const sq = sqCache[name];
                     const piece = board[dr][dc];
 
                     sq.classList.remove('sel', 'last', 'chk', 'dot', 'ring');
@@ -563,34 +573,64 @@
         }
 
         // ── Move animation ─────────────────────────────────────
-        function animateMove(from, to, callback) {
-            const fromSq = boardEl.querySelector(`[data-s="${from}"]`);
-            const toSq = boardEl.querySelector(`[data-s="${to}"]`);
-            if (!fromSq || !toSq) { callback(); return; }
+        // Animate a single piece slide. Render() will swap the DOM to the final position
+        // after the callback runs, so we don't reset transform/zIndex here.
+        function animateSegment(from, to) {
+            const fromSq = sqCache[from];
+            const toSq = sqCache[to];
+            if (!fromSq || !toSq) return Promise.resolve();
+            const pcEl = fromSq.querySelector('.pc');
+            if (!pcEl) return Promise.resolve();
 
             const fromRect = fromSq.getBoundingClientRect();
             const toRect = toSq.getBoundingClientRect();
-            const pcEl = fromSq.querySelector('.pc');
-            if (!pcEl) { callback(); return; }
-
             const dx = toRect.left - fromRect.left;
             const dy = toRect.top - fromRect.top;
 
-            pcEl.style.transform = `translate(${dx}px, ${dy}px)`;
-            pcEl.style.zIndex = '10';
-            pcEl.classList.add('anim');
+            return new Promise(resolve => {
+                let done = false;
+                const finish = () => {
+                    if (done) return;
+                    done = true;
+                    pcEl.removeEventListener('transitionend', finish);
+                    resolve();
+                };
 
-            requestAnimationFrame(() => {
+                pcEl.style.zIndex = '10';
+                pcEl.classList.add('anim');
+
                 requestAnimationFrame(() => {
-                    pcEl.style.transform = '';
-                    pcEl.addEventListener('transitionend', function handler() {
-                        pcEl.removeEventListener('transitionend', handler);
-                        pcEl.classList.remove('anim');
-                        pcEl.style.zIndex = '';
-                        callback();
+                    requestAnimationFrame(() => {
+                        pcEl.addEventListener('transitionend', finish);
+                        pcEl.style.transform = `translate(${dx}px, ${dy}px)`;
+                        // Safety fallback: if transitionend never fires (tab backgrounded,
+                        // element replaced, reduced motion) resolve after a bounded wait.
+                        setTimeout(finish, 400);
                     });
                 });
             });
+        }
+
+        function animateMove(segments, callback) {
+            if (!segments || !segments.length) { callback(); return; }
+            animating = true;
+            Promise.all(segments.map(s => animateSegment(s.from, s.to))).then(() => {
+                animating = false;
+                callback();
+            });
+        }
+
+        // Compute all piece slides for a move (king + rook for castling).
+        function moveSegments(mv) {
+            const segments = [{ from: mv.from, to: mv.to }];
+            const rank = mv.from[1];
+            if (mv.flags && mv.flags.includes('k')) segments.push({ from: 'h' + rank, to: 'f' + rank });
+            else if (mv.flags && mv.flags.includes('q')) segments.push({ from: 'a' + rank, to: 'd' + rank });
+            return segments;
+        }
+
+        function isCaptureMove(mv) {
+            return !!mv.flags && (mv.flags.includes('c') || mv.flags.includes('e'));
         }
 
         // ── UI updates ─────────────────────────────────────────
@@ -613,7 +653,7 @@
             $('bottomName').textContent = flipped ? 'Computer' : 'You';
 
             // Undo
-            $('undoBtn').disabled = thinking || game.history().length < 2;
+            $('undoBtn').disabled = thinking || animating || game.history().length < 2;
 
             // Captured pieces
             updateCaptured();
@@ -659,14 +699,14 @@
 
         // ── Interaction ────────────────────────────────────────
         function tap(name) {
-            if (thinking || game.turn() !== 'w' || game.game_over()) return;
+            if (thinking || animating || game.turn() !== 'w' || game.game_over()) return;
             const piece = game.get(name);
 
             if (selected) {
                 const mv = moves.find(m => m.to === name);
                 if (mv) {
                     if (mv.flags.includes('p')) { showPromo(selected, name); }
-                    else { doMove(selected, name); }
+                    else { doMove(selected, name, null, mv); }
                     return;
                 }
                 if (piece && piece.color === 'w') { select(name); return; }
@@ -688,18 +728,22 @@
             render();
         }
 
-        function doMove(from, to, promotion) {
-            const isCapture = game.get(to) !== null;
+        function doMove(from, to, promotion, mvInfo) {
+            // mvInfo comes from the legal-moves array and already carries flags.
+            // Fall back to a minimal shape if the caller didn't pass one (e.g. promotion handler).
+            const mv = mvInfo || { from, to, flags: game.get(to) ? 'c' : 'n' };
+            const segments = moveSegments(mv);
+            const isCapture = isCaptureMove(mv) || !!promotion && !!game.get(to);
 
-            // Animate first, then execute
-            animateMove(from, to, () => {
-                const mv = game.move({ from, to, promotion });
-                if (!mv) return;
+            selected = null;
+            moves = [];
+            render();
+
+            animateMove(segments, () => {
+                const applied = game.move({ from, to, promotion });
+                if (!applied) { render(); return; }
                 lastMove = { from, to };
-                selected = null;
-                moves = [];
 
-                // Sound
                 if (game.in_check()) beep(880, 0.12, 'sine');
                 else if (isCapture) beep(300, 0.1, 'square');
                 else beep(600, 0.06, 'triangle');
@@ -736,50 +780,61 @@
         async function aiMove() {
             thinking = true;
             render();
-            await new Promise(r => setTimeout(r, 200));
+            await new Promise(r => setTimeout(r, 150));
 
             const mv = bestMove(searchDepth);
-            if (mv) {
-                const isCapture = game.get(mv.to) !== null;
+            if (!mv) {
+                thinking = false;
+                render();
+                checkEnd();
+                return;
+            }
+
+            const isCapture = isCaptureMove(mv);
+            const segments = moveSegments(mv);
+
+            animateMove(segments, () => {
                 game.move(mv);
                 lastMove = { from: mv.from, to: mv.to };
 
                 if (game.in_check()) beep(880, 0.12, 'sine');
                 else if (isCapture) beep(300, 0.1, 'square');
                 else beep(600, 0.06, 'triangle');
-            }
 
-            thinking = false;
-            render();
-            checkEnd();
+                thinking = false;
+                render();
+                checkEnd();
+            });
         }
 
         function bestMove(depth) {
             const allMoves = game.moves({ verbose: true });
             if (!allMoves.length) return null;
             orderMoves(allMoves);
-            let best = allMoves[0];
             let bestVal = -Infinity;
+            let bests = [];
             for (const mv of allMoves) {
                 game.move(mv);
-                const val = -negamax(depth - 1, -Infinity, Infinity);
+                const val = -negamax(depth - 1, -Infinity, Infinity, 1);
                 game.undo();
-                if (val > bestVal) { bestVal = val; best = mv; }
+                if (val > bestVal) { bestVal = val; bests = [mv]; }
+                else if (val === bestVal) bests.push(mv);
             }
-            return best;
+            // Random tiebreak so the computer doesn't play identically every game.
+            return bests[Math.floor(Math.random() * bests.length)];
         }
 
-        function negamax(depth, alpha, beta) {
-            if (depth === 0 || game.game_over()) return evaluate();
+        function negamax(depth, alpha, beta, ply) {
+            if (depth === 0 || game.game_over()) return evaluate(ply);
             const allMoves = game.moves({ verbose: true });
             orderMoves(allMoves);
             let max = -Infinity;
             for (const mv of allMoves) {
                 game.move(mv);
-                const val = -negamax(depth - 1, -beta, -alpha);
+                const val = -negamax(depth - 1, -beta, -alpha, ply + 1);
                 game.undo();
-                max = Math.max(max, val);
-                alpha = Math.max(alpha, val);
+                if (val > max) max = val;
+                if (val > alpha) alpha = val;
                 if (alpha >= beta) break;
             }
             return max;
@@ -796,8 +851,9 @@
             });
         }
 
-        function evaluate() {
-            if (game.in_checkmate()) return -50000;
+        function evaluate(ply) {
+            // Faster mates are worth more; slower mates (further in the tree) are worth less.
+            if (game.in_checkmate()) return -50000 + (ply || 0);
             if (game.in_draw()) return 0;
             const turn = game.turn();
             let score = 0;
@@ -822,10 +878,12 @@
                 msg = game.turn() === 'w' ? 'Checkmate. Better luck next time.' : 'Checkmate. Well played!';
             } else if (game.in_stalemate()) {
                 title = 'Draw'; msg = 'Stalemate.';
-            } else if (game.in_draw()) {
-                title = 'Draw'; msg = 'Draw by repetition or 50-move rule.';
             } else if (game.insufficient_material()) {
                 title = 'Draw'; msg = 'Insufficient material.';
+            } else if (game.in_threefold_repetition()) {
+                title = 'Draw'; msg = 'Threefold repetition.';
+            } else {
+                title = 'Draw'; msg = 'Fifty-move rule.';
             }
             $('goTitle').textContent = title;
             $('goMsg').textContent = msg;
@@ -835,9 +893,10 @@
 
         // ── Undo ───────────────────────────────────────────────
         function undo() {
-            if (thinking || game.history().length < 2) return;
+            if (thinking || animating || game.history().length < 2) return;
             game.undo();
             game.undo();
+            $('gameOver').classList.remove('show');
             const hist = game.history({ verbose: true });
             lastMove = hist.length ? { from: hist[hist.length-1].from, to: hist[hist.length-1].to } : null;
             deselect();
@@ -849,6 +908,7 @@
             moves = [];
             lastMove = null;
             thinking = false;
+            animating = false;
             $('gameOver').classList.remove('show');
             render();
         }
