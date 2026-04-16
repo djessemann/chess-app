@@ -12,35 +12,41 @@
     <link rel="icon" type="image/svg+xml" href="assets/icon.svg">
     <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon-32.png">
     <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Xanh+Mono:ital@0;1&display=swap">
     <title>Chess</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
         :root {
-            --light: #f0d9b5;
-            --dark: #b58863;
-            --bg: #1a1a1a;
-            --card: #262626;
-            --card-hi: #2e2e2e;
+            /* A warmer, more paper-like board pairs better with the serif-mono type. */
+            --light: #ece0c4;
+            --dark: #a88867;
+            --bg: #181614;
+            --card: #24221f;
+            --card-hi: #2d2a26;
             --accent: #7fa650;
-            --text: #e8e8e8;
-            --muted: #888;
+            --text: #ece7df;
+            --muted: #8a857d;
             --hairline: rgba(255,255,255,0.06);
             /* Portrait default. Media queries override for landscape / tablet. */
             --board-size: min(92vw, calc(100dvh - 220px), 520px);
             --focus: 0 0 0 3px rgba(127, 166, 80, 0.55);
+            --font-body: 'Xanh Mono', ui-monospace, 'SF Mono', 'Menlo', 'Consolas', 'Courier New', monospace;
         }
 
         html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+            font-family: var(--font-body);
             background: var(--bg);
             color: var(--text);
             height: 100dvh;
             overflow: hidden;
             padding: max(8px, env(safe-area-inset-top)) max(8px, env(safe-area-inset-right)) max(8px, env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
             -webkit-touch-callout: none;
+            font-feature-settings: 'kern';
         }
 
         .app {
@@ -83,7 +89,9 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 12px;
         }
 
         .turn-dot {
@@ -95,16 +103,16 @@
         .turn-dot.active { background: var(--accent); box-shadow: 0 0 8px rgba(127,166,80,0.5); }
 
         .captured-pieces {
-            font-size: 12px;
+            font-size: 14px;
             opacity: 0.75;
             letter-spacing: -1px;
+            /* Unicode chess glyphs: fall out of Xanh Mono back to a system font that has them. */
+            font-family: 'Segoe UI Symbol', 'Apple Color Emoji', serif;
         }
 
         .mat-diff {
             font-size: 11px;
             color: var(--muted);
-            font-weight: 600;
-            font-variant-numeric: tabular-nums;
             margin-left: 4px;
         }
 
@@ -181,14 +189,13 @@
 
         .coord {
             position: absolute;
-            font-size: 10px;
-            font-weight: 700;
+            font-size: 11px;
+            font-style: italic;
             pointer-events: none;
-            opacity: 0.55;
-            font-variant-numeric: tabular-nums;
+            opacity: 0.6;
         }
-        .coord.file { bottom: 1px; right: 3px; }
-        .coord.rank { top: 1px; left: 3px; }
+        .coord.file { bottom: 1px; right: 4px; }
+        .coord.rank { top: 2px; left: 4px; }
         .sq.l .coord { color: var(--dark); }
         .sq.d .coord { color: var(--light); }
         .no-coords .coord { display: none; }
@@ -198,10 +205,10 @@
             font-size: 13px;
             color: var(--muted);
             min-height: 20px;
-            font-variant-numeric: tabular-nums;
             text-align: center;
+            font-style: italic;
         }
-        #status.check { color: #e66; font-weight: 600; }
+        #status.check { color: #e66; font-style: normal; letter-spacing: 0.04em; }
 
         /* Move list */
         #moveList {
@@ -215,9 +222,8 @@
         }
         #moveList h3 {
             font-size: 11px;
-            font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.16em;
             color: var(--muted);
             padding: 8px 12px 6px;
         }
@@ -229,15 +235,14 @@
         }
         .move-row {
             display: grid;
-            grid-template-columns: 28px 1fr 1fr;
+            grid-template-columns: 32px 1fr 1fr;
             align-items: center;
             gap: 4px;
             font-size: 13px;
-            font-variant-numeric: tabular-nums;
             padding: 2px 4px;
             border-radius: 6px;
         }
-        .move-row .num { color: var(--muted); font-size: 11px; text-align: right; }
+        .move-row .num { color: var(--muted); font-size: 11px; text-align: right; font-style: italic; }
         .move-row .san {
             padding: 4px 8px;
             border-radius: 5px;
@@ -245,8 +250,9 @@
             min-height: 26px;
             display: flex;
             align-items: center;
+            letter-spacing: 0.02em;
         }
-        .move-row .san.current { background: var(--accent); color: #fff; font-weight: 600; }
+        .move-row .san.current { background: var(--accent); color: #fff; }
         .move-empty {
             font-size: 12px;
             color: var(--muted);
@@ -265,8 +271,9 @@
         .btn {
             flex: 1;
             padding: 12px 0;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
             border: none;
             border-radius: 8px;
             cursor: pointer;
@@ -333,8 +340,14 @@
         }
         .overlay.show .modal { transform: scale(1); }
 
-        .modal h2 { margin-bottom: 6px; font-size: 22px; text-wrap: balance; }
-        .modal p { color: var(--muted); margin-bottom: 20px; font-size: 14px; text-wrap: pretty; }
+        .modal h2 {
+            margin-bottom: 6px;
+            font-size: 24px;
+            letter-spacing: 0.02em;
+            text-wrap: balance;
+            font-weight: 400;
+        }
+        .modal p { color: var(--muted); margin-bottom: 20px; font-size: 14px; font-style: italic; text-wrap: pretty; }
 
         .modal .btn { padding: 12px 24px; width: auto; min-width: 120px; }
         .modal .btn.pri { background: var(--accent); color: #fff; }
@@ -366,15 +379,18 @@
         }
         .title-icon { width: 96px; height: 96px; border-radius: 20px; }
         .title-brand h1 {
-            font-size: 36px;
-            font-weight: 700;
-            letter-spacing: -0.02em;
+            font-size: 44px;
+            font-weight: 400;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
         }
         .title-sub {
             color: var(--muted);
-            font-size: 14px;
+            font-size: 13px;
             text-align: center;
             margin-bottom: 12px;
+            font-style: italic;
+            letter-spacing: 0.02em;
         }
         .title-step { display: flex; flex-direction: column; gap: 4px; }
         .title-step[hidden] { display: none; }
@@ -398,8 +414,8 @@
         .title-btn:hover { background: var(--card-hi); }
         .title-btn:active { transform: scale(0.98); }
         .title-btn:focus-visible { outline: none; box-shadow: var(--focus); }
-        .title-btn-title { font-size: 17px; font-weight: 600; }
-        .title-btn-sub { font-size: 13px; color: var(--muted); }
+        .title-btn-title { font-size: 17px; letter-spacing: 0.04em; }
+        .title-btn-sub { font-size: 13px; color: var(--muted); font-style: italic; }
         .title-diff {
             align-self: center;
             margin-bottom: 8px;
@@ -471,7 +487,13 @@
             align-items: center;
             padding-bottom: 4px;
         }
-        .sheet-header h3 { font-size: 17px; font-weight: 600; }
+        .sheet-header h3 {
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.16em;
+            color: var(--muted);
+            font-weight: 400;
+        }
         .sheet-close {
             background: transparent;
             border: none;
@@ -503,8 +525,9 @@
         }
         .seg-btn {
             padding: 8px 16px;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
             border: none;
             cursor: pointer;
             background: transparent;
