@@ -1,0 +1,3 @@
+Chess piece SVGs ("Cburnett" set) by Colin M.L. Burnett.
+Sourced from https://commons.wikimedia.org/wiki/Category:SVG_chess_pieces
+Licensed under CC BY-SA 3.0 / GNU FDL.
