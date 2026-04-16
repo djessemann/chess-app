@@ -858,9 +858,15 @@
             } catch(e) { return false; }
         }
 
+        // Web Vibration API — supported on Android browsers (Chrome, Firefox, Samsung
+        // Internet). iOS Safari has never shipped it, and there's no other web-standard
+        // way to trigger the Taptic Engine, so on iPhone/iPad this silently no-ops.
+        const hapticsSupported = typeof navigator !== 'undefined'
+            && typeof navigator.vibrate === 'function';
+
         function haptic(pattern) {
-            if (!hapticsOn) return;
-            try { navigator.vibrate && navigator.vibrate(pattern); } catch(e) {}
+            if (!hapticsOn || !hapticsSupported) return;
+            try { navigator.vibrate(pattern); } catch(e) {}
         }
 
         const $ = id => document.getElementById(id);
@@ -1527,8 +1533,9 @@
             hapticsOn = !hapticsOn;
             setToggle($('hapticToggle'), hapticsOn);
             saveSettings();
-            // Give a small buzz as feedback when turning on.
-            if (hapticsOn) haptic(10);
+            // Distinct triple-pulse confirms the toggle took effect on devices that
+            // support vibration. Very short single pulses are filtered on some Androids.
+            if (hapticsOn) haptic([25, 40, 25, 40, 25]);
         });
 
         // ── Init settings UI state ─────────────────────────────
@@ -1536,6 +1543,13 @@
             setToggle($('soundToggle'), soundOn);
             setToggle($('coordToggle'), showCoords);
             setToggle($('hapticToggle'), hapticsOn);
+            // Hide the haptics row entirely on platforms without Web Vibration
+            // (notably iOS Safari) — showing a toggle that does nothing is worse
+            // than not showing it at all.
+            if (!hapticsSupported) {
+                const row = $('hapticToggle').closest('.setting-row');
+                if (row) row.hidden = true;
+            }
         }
 
         // ── Title screen flow ──────────────────────────────────
