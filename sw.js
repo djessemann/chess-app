@@ -1,6 +1,6 @@
 // Service worker for Chess PWA. Cache-first for the app shell so the game works offline.
 // Bump CACHE_VERSION on every deploy so clients pick up new assets.
-const CACHE_VERSION = 'chess-v1';
+const CACHE_VERSION = 'chess-v2';
 const SHELL = [
   './',
   './index.html',
