@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#1a1a1a">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
@@ -18,6 +18,17 @@
     <title>Chess</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        /* Lock the UI: no native scroll, no pinch/double-tap zoom, no rubber-banding. */
+        html, body {
+            overflow: hidden;
+            overscroll-behavior: none;
+            touch-action: manipulation;
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+        }
 
         :root {
             /* A warmer, more paper-like board pairs better with the serif-mono type. */
@@ -430,7 +441,12 @@
         /* 2P hotseat: board spins 180° between turns; at spin-end we toggle
            the internal flipped state and reset the transform, so the spin
            and the state change are visually continuous. */
-        #board.spinning { transition: transform 320ms cubic-bezier(0.2, 0, 0, 1); transform: rotate(180deg); }
+        #board.spinning {
+            transition-property: transform;
+            transition-duration: 320ms;
+            transition-timing-function: cubic-bezier(0.2, 0, 0, 1);
+            transform: rotate(180deg);
+        }
         .player-bar.fading { opacity: 0; transition: opacity 200ms; }
 
         .promo-options { display: flex; gap: 8px; justify-content: center; margin-bottom: 16px; }
@@ -744,6 +760,31 @@
     <script src="vendor/chess.js"></script>
     <script>
     (() => {
+        // ── UI lock: no pinch zoom, no double-tap zoom, no scroll / rubber-banding ──
+        // iOS Safari honors gesturestart; blocking it disables pinch-zoom across the app.
+        ['gesturestart', 'gesturechange', 'gestureend'].forEach(ev => {
+            document.addEventListener(ev, e => e.preventDefault(), { passive: false });
+        });
+        // Block Ctrl/Cmd+wheel zoom on desktop.
+        document.addEventListener('wheel', e => {
+            if (e.ctrlKey || e.metaKey) e.preventDefault();
+        }, { passive: false });
+        // Block Ctrl/Cmd+[+/-/0] keyboard zoom on desktop.
+        window.addEventListener('keydown', e => {
+            if ((e.ctrlKey || e.metaKey) && ['=', '+', '-', '_', '0'].includes(e.key)) {
+                e.preventDefault();
+            }
+        });
+        // Belt-and-suspenders double-tap zoom blocker for older iOS. If two touchend events
+        // fire within 300ms, swallow the second — CSS touch-action: manipulation handles
+        // modern iOS, but this covers edge cases.
+        let lastTouchEnd = 0;
+        document.addEventListener('touchend', e => {
+            const now = Date.now();
+            if (now - lastTouchEnd <= 300) e.preventDefault();
+            lastTouchEnd = now;
+        }, { passive: false });
+
         // Unicode for small captured piece display
         const PU = {
             K:'♔', Q:'♕', R:'♖', B:'♗', N:'♘', P:'♙',
@@ -831,6 +872,10 @@
                 mode = s.mode;
                 searchDepth = s.depth || 3;
                 flipped = !!s.flipped;
+                // In 2P hotseat, orientation is a function of whose turn it is. If a game was
+                // saved mid-rotation (or with legacy data), recompute so the mover always sees
+                // their pieces at the bottom.
+                if (mode === '2p' && !game.game_over()) flipped = (game.turn() === 'b');
                 const hist = game.history({ verbose: true });
                 if (hist.length) {
                     const last = hist[hist.length - 1];
@@ -1048,6 +1093,10 @@
             const minHist = mode === '2p' ? 1 : 2;
             $('undoBtn').disabled = thinking || animating || game.history().length < minHist;
 
+            // In 2P the board auto-rotates each ply, so a manual Flip is redundant and can
+            // desync orientation from whose turn it is. Hide it.
+            $('flipBtn').hidden = (mode === '2p');
+
             // Captured pieces
             updateCaptured();
 
@@ -1139,6 +1188,7 @@
                 flipped = (game.turn() === 'b');
                 buildBoard();
                 render();
+                saveGame();
                 if (done) done();
                 return;
             }
@@ -1155,6 +1205,8 @@
                 flipped = (game.turn() === 'b');
                 buildBoard();
                 render();
+                // Persist post-rotation orientation so a mid-rotation close restores correctly.
+                saveGame();
                 animating = false;
                 if (done) done();
             };
@@ -1196,13 +1248,14 @@
         function handleTap(name) {
             if (!canInteract()) return;
             const piece = game.get(name);
+            const mover = game.turn();
             if (selected) {
                 if (tryMoveTo(selected, name)) return;
-                if (piece && piece.color === 'w') { select(name); return; }
+                if (piece && piece.color === mover) { select(name); return; }
                 deselect();
                 return;
             }
-            if (piece && piece.color === 'w') select(name);
+            if (piece && piece.color === mover) select(name);
         }
 
         // Drag state
@@ -1268,7 +1321,7 @@
                 x: e.clientX,
                 y: e.clientY,
                 sq: name,
-                isOwnPiece: !!(piece && piece.color === 'w'),
+                isOwnPiece: !!(piece && piece.color === game.turn()),
                 pcEl
             };
             // Capture so we keep receiving move/up even if the pointer leaves the board.
@@ -1662,7 +1715,7 @@
             const k = e.key.toLowerCase();
             if (k === 'n') { showTitle(); }
             else if (k === 'u') { undo(); }
-            else if (k === 'f') { flipBoard(); }
+            else if (k === 'f' && mode !== '2p') { flipBoard(); }
         });
 
         // ── Start ──────────────────────────────────────────────
