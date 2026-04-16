@@ -211,7 +211,6 @@
         .coord.rank { top: 2px; left: 4px; }
         .sq.l .coord { color: var(--dark); }
         .sq.d .coord { color: var(--light); }
-        .no-coords .coord { display: none; }
 
         /* Status */
         #status {
@@ -449,68 +448,6 @@
         .promo-btn:focus-visible { outline: none; box-shadow: var(--focus); }
         .promo-btn img { width: 80%; height: 80%; }
 
-        /* Settings sheet (mobile: bottom; tablet+: centered modal). No fade — hard cut. */
-        .settings-backdrop {
-            position: fixed; inset: 0;
-            background: rgba(40,34,24,0.35);
-            z-index: 19;
-            display: none;
-        }
-        .settings-backdrop.open { display: block; }
-
-        .settings-panel {
-            position: fixed;
-            bottom: 0; left: 0; right: 0;
-            background: var(--card);
-            border-radius: 16px 16px 0 0;
-            padding: 8px 24px 20px;
-            padding-bottom: max(20px, env(safe-area-inset-bottom));
-            z-index: 20;
-            display: none;
-        }
-        .settings-panel.open { display: block; }
-
-        .sheet-handle {
-            width: 36px; height: 4px;
-            background: rgba(0,0,0,0.18);
-            border-radius: 2px;
-            margin: 6px auto 12px;
-        }
-
-        .sheet-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 4px;
-        }
-        .sheet-header h3 {
-            font-size: 16px;
-            letter-spacing: 0.06em;
-            color: var(--muted);
-        }
-        .sheet-close {
-            background: transparent;
-            border: none;
-            color: var(--muted);
-            cursor: pointer;
-            font-size: 26px;
-            line-height: 1;
-            padding: 4px 8px;
-            border-radius: 6px;
-        }
-        .sheet-close:hover { color: var(--text); background: var(--card-hi); }
-        .sheet-close:focus-visible { outline: none; box-shadow: var(--focus); }
-
-        .setting-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 14px 0;
-            min-height: 48px;
-        }
-        .setting-row + .setting-row { border-top: 1px solid var(--hairline); }
-        .setting-label { font-size: 18px; }
-
         .seg-control {
             display: flex;
             background: rgba(0,0,0,0.06);
@@ -531,36 +468,6 @@
         }
         .seg-btn.active { background: var(--accent); color: #fff; }
         .seg-btn:focus-visible { outline: none; box-shadow: inset var(--focus); }
-
-        .toggle {
-            width: 50px; height: 30px;
-            border-radius: 15px;
-            background: rgba(0,0,0,0.16);
-            cursor: pointer;
-            position: relative;
-            border: none;
-            padding: 0;
-            transition: background 120ms;
-        }
-        .toggle.on { background: var(--accent); }
-        .toggle::after {
-            content: '';
-            position: absolute;
-            top: 3px; left: 3px;
-            width: 24px; height: 24px;
-            border-radius: 50%;
-            background: #fff;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.25);
-            transition: transform 160ms cubic-bezier(0.2, 0, 0, 1);
-        }
-        .toggle.on::after { transform: translateX(20px); }
-        .toggle:focus-visible { outline: none; box-shadow: var(--focus); }
-
-        /* Quit button fills its settings row. */
-        .quit-btn { width: 100%; flex: none; background: rgba(178,59,59,0.12); color: #8a2e2e; }
-        .quit-btn:hover:not(:disabled) { background: rgba(178,59,59,0.2); }
-        .quit-btn.confirm { background: #8a2e2e; color: #fff; }
-        .quit-btn.confirm:hover:not(:disabled) { background: #a03636; }
 
         /* Thinking dots */
         .dots { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
@@ -603,19 +510,6 @@
             }
             .player-bar { font-size: 18px; }
             #moveList { display: flex; flex: 1 1 auto; min-height: 0; }
-            .settings-panel {
-                left: 50%;
-                right: auto;
-                top: 50%;
-                bottom: auto;
-                transform: translate(-50%, -50%) scale(0.96);
-                width: 420px;
-                max-width: 90vw;
-                border-radius: 16px;
-                padding: 20px 24px;
-            }
-            .settings-panel.open { transform: translate(-50%, -50%) scale(1); }
-            .settings-panel .sheet-handle { display: none; }
         }
 
         /* Respect reduced motion */
@@ -656,8 +550,8 @@
         </div>
     </div>
 
-    <button class="gear" id="settingsBtn" aria-label="Settings">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M19.14 12.94c.04-.31.06-.63.06-.94s-.02-.63-.06-.94l2.03-1.58a.5.5 0 0 0 .12-.63l-1.92-3.32a.5.5 0 0 0-.6-.22l-2.39.96a7 7 0 0 0-1.62-.94l-.36-2.54a.5.5 0 0 0-.5-.42h-3.84a.5.5 0 0 0-.5.42l-.36 2.54c-.58.24-1.12.55-1.62.94l-2.39-.96a.5.5 0 0 0-.6.22L2.68 8.85a.5.5 0 0 0 .12.63l2.03 1.58c-.04.31-.06.63-.06.94s.02.63.06.94L2.8 14.52a.5.5 0 0 0-.12.63l1.92 3.32c.13.22.39.31.6.22l2.39-.96c.5.39 1.04.7 1.62.94l.36 2.54c.05.24.26.42.5.42h3.84c.24 0 .45-.18.5-.42l.36-2.54c.58-.24 1.12-.55 1.62-.94l2.39.96c.21.09.47 0 .6-.22l1.92-3.32a.5.5 0 0 0-.12-.63l-2.03-1.58zM12 15.5a3.5 3.5 0 1 1 0-7 3.5 3.5 0 0 1 0 7z"/></svg>
+    <button class="gear" id="restartBtn" aria-label="Restart">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5V2L7 7l5 5V8c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
     </button>
 
     <div class="overlay" id="gameOver" role="dialog" aria-modal="true" aria-labelledby="goTitle">
@@ -711,27 +605,14 @@
         </div>
     </div>
 
-    <div class="settings-backdrop" id="settingsBackdrop"></div>
-    <div class="settings-panel" id="settingsPanel" role="dialog" aria-modal="true" aria-labelledby="settingsTitle">
-        <div class="sheet-handle" aria-hidden="true"></div>
-        <div class="sheet-header">
-            <h3 id="settingsTitle">Settings</h3>
-            <button class="sheet-close" id="settingsClose" aria-label="Close settings">&times;</button>
-        </div>
-        <div class="setting-row">
-            <span class="setting-label" id="soundLabel">Sound</span>
-            <button class="toggle on" id="soundToggle" role="switch" aria-checked="true" aria-labelledby="soundLabel"></button>
-        </div>
-        <div class="setting-row">
-            <span class="setting-label" id="coordLabel">Coordinates</span>
-            <button class="toggle on" id="coordToggle" role="switch" aria-checked="true" aria-labelledby="coordLabel"></button>
-        </div>
-        <div class="setting-row">
-            <span class="setting-label" id="hapticLabel">Haptics</span>
-            <button class="toggle on" id="hapticToggle" role="switch" aria-checked="true" aria-labelledby="hapticLabel"></button>
-        </div>
-        <div class="setting-row">
-            <button class="btn quit-btn" id="quitBtn">Quit</button>
+    <div class="overlay" id="restartOverlay" role="dialog" aria-modal="true" aria-labelledby="restartTitle">
+        <div class="modal">
+            <h2 id="restartTitle">Restart?</h2>
+            <p>Your current game will end.</p>
+            <div class="modal-actions">
+                <button class="btn" id="restartCancelBtn">Cancel</button>
+                <button class="btn pri" id="restartConfirmBtn">Restart</button>
+            </div>
         </div>
     </div>
 
@@ -800,26 +681,7 @@
         let flipped = false;
         let mode = null;           // '1p' | '2p' — null means title screen is showing
         let searchDepth = 3;       // only meaningful in 1p; locked once a 1p game begins
-        let soundOn = true;
-        let showCoords = true;
-        let hapticsOn = true;
         const sqCache = {};
-
-        // Load saved settings (persistent prefs, not game-specific)
-        try {
-            const s = JSON.parse(localStorage.getItem('chess-settings'));
-            if (s) {
-                soundOn = s.sound !== false;
-                showCoords = s.coords !== false;
-                hapticsOn = s.haptics !== false;
-            }
-        } catch(e) {}
-
-        function saveSettings() {
-            localStorage.setItem('chess-settings', JSON.stringify({
-                sound: soundOn, coords: showCoords, haptics: hapticsOn
-            }));
-        }
 
         // Persist the in-progress game (mode, difficulty for 1p, PGN).
         function saveGame() {
@@ -865,7 +727,7 @@
             && typeof navigator.vibrate === 'function';
 
         function haptic(pattern) {
-            if (!hapticsOn || !hapticsSupported) return;
+            if (!hapticsSupported) return;
             try { navigator.vibrate(pattern); } catch(e) {}
         }
 
@@ -875,7 +737,6 @@
         // ── Sound ──────────────────────────────────────────────
         let audioCtx;
         function beep(freq, dur, type) {
-            if (!soundOn) return;
             if (!audioCtx) {
                 const Ctor = window.AudioContext || window.webkitAudioContext;
                 if (!Ctor) return;
@@ -931,7 +792,6 @@
                     sqCache[name] = sq;
                 }
             }
-            boardEl.classList.toggle('no-coords', !showCoords);
         }
 
         // ── Render ─────────────────────────────────────────────
@@ -1495,63 +1355,6 @@
             render();
         }
 
-        // ── Settings ───────────────────────────────────────────
-        function openSettings() {
-            $('settingsBackdrop').classList.add('open');
-            $('settingsPanel').classList.add('open');
-        }
-
-        function closeSettings() {
-            $('settingsBackdrop').classList.remove('open');
-            $('settingsPanel').classList.remove('open');
-            // Reset the quit-to-title confirmation if the panel is closed mid-confirm.
-            if (typeof resetQuitButton === 'function') resetQuitButton();
-        }
-
-        function setToggle(el, on) {
-            el.classList.toggle('on', on);
-            el.setAttribute('aria-checked', on ? 'true' : 'false');
-        }
-
-        // Sound toggle
-        $('soundToggle').addEventListener('click', () => {
-            soundOn = !soundOn;
-            setToggle($('soundToggle'), soundOn);
-            saveSettings();
-        });
-
-        // Coords toggle
-        $('coordToggle').addEventListener('click', () => {
-            showCoords = !showCoords;
-            setToggle($('coordToggle'), showCoords);
-            boardEl.classList.toggle('no-coords', !showCoords);
-            saveSettings();
-        });
-
-        // Haptics toggle
-        $('hapticToggle').addEventListener('click', () => {
-            hapticsOn = !hapticsOn;
-            setToggle($('hapticToggle'), hapticsOn);
-            saveSettings();
-            // Distinct triple-pulse confirms the toggle took effect on devices that
-            // support vibration. Very short single pulses are filtered on some Androids.
-            if (hapticsOn) haptic([25, 40, 25, 40, 25]);
-        });
-
-        // ── Init settings UI state ─────────────────────────────
-        function initSettingsUI() {
-            setToggle($('soundToggle'), soundOn);
-            setToggle($('coordToggle'), showCoords);
-            setToggle($('hapticToggle'), hapticsOn);
-            // Hide the haptics row entirely on platforms without Web Vibration
-            // (notably iOS Safari) — showing a toggle that does nothing is worse
-            // than not showing it at all.
-            if (!hapticsSupported) {
-                const row = $('hapticToggle').closest('.setting-row');
-                if (row) row.hidden = true;
-            }
-        }
-
         // ── Title screen flow ──────────────────────────────────
         const titleEl = $('titleScreen');
         const stepMode = $('titleStepMode');
@@ -1624,34 +1427,15 @@
         // ── Wire up ────────────────────────────────────────────
         $('undoBtn').addEventListener('click', undo);
         $('flipBtn').addEventListener('click', flipBoard);
-        $('settingsBtn').addEventListener('click', openSettings);
-        $('settingsBackdrop').addEventListener('click', closeSettings);
-        $('settingsClose').addEventListener('click', closeSettings);
-
-        // Quit to Title needs a confirmation: a first tap arms the button
-        // ("Tap again to confirm"), a second tap within 4s commits. Closing
-        // settings or letting the timer lapse resets it.
-        const quitBtn = $('quitBtn');
-        let quitArmed = false;
-        let quitTimer = null;
-        function resetQuitButton() {
-            quitArmed = false;
-            quitBtn.classList.remove('confirm');
-            quitBtn.textContent = 'Quit';
-            if (quitTimer) { clearTimeout(quitTimer); quitTimer = null; }
-        }
-        quitBtn.addEventListener('click', () => {
-            if (quitArmed) {
-                resetQuitButton();
-                closeSettings();
-                showTitle();
-                return;
-            }
-            quitArmed = true;
-            quitBtn.classList.add('confirm');
-            quitBtn.textContent = 'Sure?';
-            haptic(10);
-            quitTimer = setTimeout(resetQuitButton, 4000);
+        $('restartBtn').addEventListener('click', () => {
+            $('restartOverlay').classList.add('show');
+        });
+        $('restartCancelBtn').addEventListener('click', () => {
+            $('restartOverlay').classList.remove('show');
+        });
+        $('restartConfirmBtn').addEventListener('click', () => {
+            $('restartOverlay').classList.remove('show');
+            showTitle();
         });
         $('goBtn').addEventListener('click', () => {
             // Play Again: same mode + (for 1p) same difficulty.
@@ -1671,7 +1455,7 @@
             const typing = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable);
             if (typing) return;
             if (e.key === 'Escape') {
-                if ($('settingsPanel').classList.contains('open')) closeSettings();
+                if ($('restartOverlay').classList.contains('show')) $('restartOverlay').classList.remove('show');
                 else if ($('promoOverlay').classList.contains('show')) {
                     // Closing the promo without a choice would leave the move unfinished; ignore.
                 } else if ($('gameOver').classList.contains('show')) { $('gameOver').classList.remove('show'); showTitle(); }
@@ -1685,7 +1469,6 @@
         });
 
         // ── Start ──────────────────────────────────────────────
-        initSettingsUI();
         if (loadGame()) {
             // Continue a saved game.
             buildBoard();
