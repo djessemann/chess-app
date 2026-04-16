@@ -679,7 +679,6 @@
                 <h1 id="titleHeading">Chess</h1>
             </div>
             <div id="titleStepMode" class="title-step">
-                <p class="title-sub">Choose a mode</p>
                 <div class="title-modes">
                     <button class="title-btn" id="mode1pBtn">
                         <span class="title-btn-title">1 Player</span>
@@ -733,7 +732,7 @@
             <button class="toggle on" id="hapticToggle" role="switch" aria-checked="true" aria-labelledby="hapticLabel"></button>
         </div>
         <div class="setting-row">
-            <button class="btn quit-btn" id="quitBtn">Quit to Title</button>
+            <button class="btn quit-btn" id="quitBtn">Quit</button>
         </div>
     </div>
 
@@ -1625,7 +1624,7 @@
         function resetQuitButton() {
             quitArmed = false;
             quitBtn.classList.remove('confirm');
-            quitBtn.textContent = 'Quit to Title';
+            quitBtn.textContent = 'Quit';
             if (quitTimer) { clearTimeout(quitTimer); quitTimer = null; }
         }
         quitBtn.addEventListener('click', () => {
@@ -1637,7 +1636,7 @@
             }
             quitArmed = true;
             quitBtn.classList.add('confirm');
-            quitBtn.textContent = 'Tap again to confirm';
+            quitBtn.textContent = 'Sure?';
             haptic(10);
             quitTimer = setTimeout(resetQuitButton, 4000);
         });
