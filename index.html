@@ -390,7 +390,9 @@
             font-weight: 400;
             letter-spacing: 0.02em;
         }
-        .title-step { display: flex; flex-direction: column; gap: 4px; }
+        /* Matched min-height so the title-card height is identical between
+           the mode and difficulty steps, keeping the logo + wordmark pinned. */
+        .title-step { display: flex; flex-direction: column; gap: 4px; min-height: 170px; }
         .title-step[hidden] { display: none; }
         .title-modes { display: flex; flex-direction: column; gap: 10px; }
         .title-btn {
