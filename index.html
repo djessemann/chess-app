@@ -369,6 +369,11 @@
             flex-direction: column;
             gap: 20px;
             align-items: stretch;
+            /* Fixed min-height absorbs the difference between the mode and
+               difficulty steps so the card's total height — and therefore the
+               overlay's centered vertical position of the logo + wordmark —
+               never changes between the two views. */
+            min-height: 460px;
         }
         .title-brand {
             display: flex;
@@ -390,9 +395,7 @@
             font-weight: 400;
             letter-spacing: 0.02em;
         }
-        /* Matched min-height so the title-card height is identical between
-           the mode and difficulty steps, keeping the logo + wordmark pinned. */
-        .title-step { display: flex; flex-direction: column; gap: 4px; min-height: 170px; }
+        .title-step { display: flex; flex-direction: column; gap: 4px; }
         .title-step[hidden] { display: none; }
         .title-modes { display: flex; flex-direction: column; gap: 10px; }
         .title-btn {
