@@ -1226,21 +1226,40 @@
             const allMoves = game.moves({ verbose: true });
             if (!allMoves.length) return null;
             orderMoves(allMoves);
-            let bestVal = -Infinity;
-            let bests = [];
+            const scored = [];
             for (const mv of allMoves) {
                 game.move(mv);
                 const val = -negamax(depth - 1, -Infinity, Infinity, 1);
                 game.undo();
-                if (val > bestVal) { bestVal = val; bests = [mv]; }
-                else if (val === bestVal) bests.push(mv);
+                scored.push({ mv, val });
             }
-            // Random tiebreak so the computer doesn't play identically every game.
-            return bests[Math.floor(Math.random() * bests.length)];
+            scored.sort((a, b) => b.val - a.val);
+
+            // Easy: pick from up to 3 near-best moves with a bias toward the best,
+            // so the engine makes some human-like suboptimal choices instead of the
+            // "perfect within its horizon" moves a pure greedy search produces.
+            if (depth <= 2) {
+                const best = scored[0].val;
+                const pool = scored.filter(s => best - s.val <= 80).slice(0, 3);
+                const weights = [3, 2, 1].slice(0, pool.length);
+                const total = weights.reduce((a, b) => a + b, 0);
+                let r = Math.random() * total;
+                for (let i = 0; i < pool.length; i++) {
+                    r -= weights[i];
+                    if (r <= 0) return pool[i].mv;
+                }
+                return pool[pool.length - 1].mv;
+            }
+
+            // Medium/Hard: best value, random tiebreak so the computer doesn't play
+            // identically every game.
+            const bests = scored.filter(s => s.val === scored[0].val);
+            return bests[Math.floor(Math.random() * bests.length)].mv;
         }
 
         function negamax(depth, alpha, beta, ply) {
-            if (depth === 0 || game.game_over()) return evaluate(ply);
+            if (game.game_over()) return evaluate(ply);
+            if (depth === 0) return quiesce(alpha, beta, ply);
             const allMoves = game.moves({ verbose: true });
             orderMoves(allMoves);
             let max = -Infinity;
@@ -1255,11 +1274,38 @@
             return max;
         }
 
+        // Quiescence search: once the main search hits depth 0, keep going through
+        // captures (and out-of-check responses) until the position is "quiet." This
+        // fixes the horizon effect where the engine would stop mid-exchange and hang
+        // material — the single biggest quality win for a naive negamax.
+        function quiesce(alpha, beta, ply) {
+            if (game.game_over()) return evaluate(ply);
+            const inCheck = game.in_check();
+            if (!inCheck) {
+                const standPat = evaluate(ply);
+                if (standPat >= beta) return beta;
+                if (standPat > alpha) alpha = standPat;
+            }
+            const all = game.moves({ verbose: true });
+            const moves = inCheck ? all : all.filter(m => m.captured || m.promotion);
+            orderMoves(moves);
+            for (const mv of moves) {
+                game.move(mv);
+                const val = -quiesce(-beta, -alpha, ply + 1);
+                game.undo();
+                if (val >= beta) return beta;
+                if (val > alpha) alpha = val;
+            }
+            return alpha;
+        }
+
+        // MVV-LVA: captures with a valuable victim and cheap attacker come first.
+        // Better ordering => more alpha-beta cutoffs => faster search.
         function orderMoves(mvs) {
             mvs.sort((a, b) => {
                 let sa = 0, sb = 0;
-                if (a.captured) sa += VAL[a.captured];
-                if (b.captured) sb += VAL[b.captured];
+                if (a.captured) sa += 10 * VAL[a.captured] - VAL[a.piece];
+                if (b.captured) sb += 10 * VAL[b.captured] - VAL[b.piece];
                 if (a.promotion) sa += VAL[a.promotion];
                 if (b.promotion) sb += VAL[b.promotion];
                 return sb - sa;
